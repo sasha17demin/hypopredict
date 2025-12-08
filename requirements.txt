@@ -13,3 +13,5 @@ jupyter
 ipykernel
 ipython
 pyarrow
+xgboost
+lightgbm
