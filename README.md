@@ -1,7 +1,7 @@
 ## Day 1: Playing with the Dataset
 
 
-This folder contains data on Type-1 Diabetic (T1D) person id 01 day 2014-10-04:
+'d1_get_familiar' folder contains data on Type-1 Diabetic (T1D) person id 01 day 2014-10-04:
 
 1/ "data/get_familiar" folder with `.feather` files for different features related to hypoglycemia
 
