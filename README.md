@@ -1,3 +1,26 @@
+## Every Morning
+
+Check our Trello board([link](https://trello.com/invite/b/6936dbc891a1f358b51364db/ATTIf0c9ea7c184b84ac2f053b107edc3b201355B91E/my-trello-board)) for the tasks, check your progress
+
+`cd ~/code/sasha17demin/hypopredict` (navigate into the project folder, check the pyenv == 'hyperpredict')
+
+`pip install --upgrade pip`
+
+`pip install -r requirements.txt` [installing new packages that others found useful will save you time]
+
+From `master`
+
+`git pull origin master` (make sure you have updated repo)
+
+`git checkout -b name_task` (moving to your working branch before making edits)
+
+
+
+
+## Day 2: Generate Some Features + Train Our First Models
+
+
+
 ## Day 1: Playing with the Dataset
 
 
