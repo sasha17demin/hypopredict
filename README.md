@@ -18,6 +18,13 @@ From `master`
 `pip install -r requirements.txt` [installing new packages that others found useful will save you time]
 
 
+## CheatSheet
+
+`git branch` -- show all your branches
+
+`git branch -D branch_name` -- deleting a branch
+
+
 
 
 
