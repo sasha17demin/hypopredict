@@ -19,6 +19,23 @@ From `master`
 
 ## Day 2: Generate Some Features + Train Our First Models
 
+### Part 1:
+
+* Move Notebooks to `notebooks` folder
+* Use the code from `d1_get_familiar` to load the data and play with it
+* Decide what model architecture (target, features) would you wanna do?
+
+* Generate Chunk 1: 2 ppl all days all features from D1NAMO
+* Write a train_test_split.py
+
+
+### Part 2:
+
+* train_test_split the Chunk 1
+* everyone preprocesses Chunk 1
+* builds baseline version of Modeil_i (Chunk 1)
+
+
 
 
 ## Day 1: Playing with the Dataset
