@@ -6,15 +6,17 @@ Check our Trello board([link](https://trello.com/invite/b/6936dbc891a1f358b51364
 
 `cd ~/code/sasha17demin/hypopredict` (navigate into the project folder, check the pyenv == 'hyperpredict')
 
-`pip install --upgrade pip`
-
-`pip install -r requirements.txt` [installing new packages that others found useful will save you time]
-
 From `master`
 
 `git pull origin master` (make sure you have updated repo)
 
 `git checkout -b name_task` (moving to your working branch before making edits)
+
+
+`pip install --upgrade pip`
+
+`pip install -r requirements.txt` [installing new packages that others found useful will save you time]
+
 
 
 
