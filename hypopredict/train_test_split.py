@@ -77,3 +77,63 @@ def get_HG_onset_times(glucose_df: pd.DataFrame, threshold: float = 3.9) -> list
         prev_time = time
 
     return times_onset
+
+
+
+
+
+
+
+######### Generating target labels #########
+
+# target label is 1 if NEXT chunk contains any of the onset times
+
+#       1       0       0       0       0
+#           |  ot   |       |       |       |
+#           |       |       |       |       |
+#     chunk1  chunk2  chunk3  chunk4  chunk5
+
+# onset_time: first time glucose < 3.9
+
+
+# refactor into fnction that takes chunks and onset times as input
+# and the forecast window (15 minutes here)
+
+def generate_target_labels(chunks: list[pd.DataFrame],
+                           onset_times: list[pd.Timestamp],
+                           forecast_window: pd.Timedelta) -> list[int]:
+    """
+    Function that generates target labels for each chunk based on onset times
+    and forecast window. If an onset time falls within the forecast window
+    after the end of a chunk, the label for that chunk is 1, otherwise 0.
+
+    Args:
+        chunks: list of pd.DataFrame - list of overlapping chunks
+                                        Should have index as datetime
+        onset_times: list of pd.Timestamp - list of Hypoglycemia onset times
+        forecast_window: pd.Timedelta - forecast window duration as timedelta
+
+    Returns:
+        list of int - list of target labels (0 or 1) for each chunk
+    """
+
+    target_labels = []
+
+    for chunk in chunks:
+
+        chunk_end_time = chunk.index[-1]
+        label = 0
+
+        # for each onset time, check if it falls within the forecast window
+        # after the end of a given chunk
+        for onset_time in onset_times:
+            if chunk_end_time < onset_time < chunk_end_time + forecast_window:
+                label = 1
+                break
+
+        target_labels.append(label)
+
+    # check that the number of labels matches the number of chunks
+    assert(len(target_labels) == len(chunks))
+
+    return target_labels
