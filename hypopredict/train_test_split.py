@@ -46,7 +46,8 @@ def chunkify(df: pd.DataFrame, chunk_size: int, step_size: int) -> list[pd.DataF
 
 # TODO: HG event is (a) glucose < 3.9 and (b) lasts for at least 15 minutes
 # currently only (a) is implemented
-
+# TODO: unique event identifier across subjects
+# to make sure we don't include the same event in train and test
 
 
 def get_HG_onset_times(glucose_df: pd.DataFrame, threshold: float = 3.9) -> list:
@@ -97,8 +98,7 @@ def get_HG_onset_times(glucose_df: pd.DataFrame, threshold: float = 3.9) -> list
 # onset_time: first time glucose < 3.9
 
 
-# refactor into fnction that takes chunks and onset times as input
-# and the forecast window (15 minutes here)
+# TODO: ongoing event identifier
 
 def generate_target_labels(chunks: list[pd.DataFrame],
                            onset_times: list[pd.Timestamp],
