@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 # split sendsor data into overlapping chunks of CHUNK_SIZE every STEP_SIZE seconds
 
@@ -137,3 +138,65 @@ def generate_target_labels(chunks: list[pd.DataFrame],
     assert(len(target_labels) == len(chunks))
 
     return target_labels
+
+
+
+
+
+
+
+######## Train-Test Split #########
+
+# last date of the last train chunk is t1
+# the first date of the first test chunk is t1+FORECAST_WINDOW
+
+def train_test_split_chunks(chunks: list[pd.DataFrame],
+                            chunk_size: int,
+                            step_size: int,
+                            target_labels: list[int],
+                            forecast_window: pd.Timedelta,
+                            sampling_rate: int = 250,
+                            test_size: float = 0.2) -> tuple:
+    """
+    Function that splits chunks and target labels into train and test sets
+    while respecting the forecast window constraint.
+
+    Args:
+        chunks: list of pd.DataFrame - list of overlapping chunks
+        step_size: int - step size between chunks in samples
+        sampling_rate: int - sampling rate of the sensor data in Hz
+
+        target_labels: list of int - list of target labels (0 or 1) for each chunk
+        forecast_window: pd.Timedelta - forecast window duration as timedelta
+        test_size: float - proportion of the dataset to include in the test split
+
+    Returns:
+        tuple - (X_train, X_test, y_train, y_test)
+    """
+
+    total_chunks = len(chunks)
+
+    # leave test_size proportion of chunks for testing
+    num_test_chunks = int(np.ceil(total_chunks * test_size))
+
+    # take all the last test_size% of chunks and labels as test set
+    split_index = total_chunks - num_test_chunks
+
+    X_test = chunks[split_index:]
+    y_test = target_labels[split_index:]
+
+
+
+
+    # make sure forecast window is in number of samples using step_size
+    forecast_window_freq = int(forecast_window.total_seconds() * sampling_rate)
+
+    # move the last index of the last train chunk to the left
+    # by at least forecast_window and chunk_size
+    last_train_chunk_index = split_index - np.ceil( (forecast_window_freq + chunk_size) / step_size).astype(int) - 1
+
+    X_train = chunks[:last_train_chunk_index]
+    y_train = target_labels[:last_train_chunk_index]
+
+
+    return X_train, X_test, y_train, y_test
