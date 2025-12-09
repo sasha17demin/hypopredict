@@ -1,3 +1,6 @@
+# Data Folder
+d1_get_familiar/data/
+
 # Standard python ignores
 *.egg-info
 .coverage
