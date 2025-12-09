@@ -1,5 +1,7 @@
 ## Every Morning
 
+Check out our Workflow at Miro ([link](https://miro.com/welcomeonboard/WVNmaGNCMzlnK1FjbDlYc2tKK1F4T3Y3K0s4Tm13MnBSY2JibElneXFzK2tBM0FPWStINXRzSHdNY1JqMCs5a3ZvQy90NVZBV3dBT3JPMTFyTTBYcjFCQ1ZPVFl1dm5ScHRJUWFEZ01pS0t2eE4wdWJObzczUTJCSVRGbSttQkJhWWluRVAxeXRuUUgwWDl3Mk1qRGVRPT0hdjE=?share_link_id=462218411826))
+
 Check our Trello board([link](https://trello.com/invite/b/6936dbc891a1f358b51364db/ATTIf0c9ea7c184b84ac2f053b107edc3b201355B91E/my-trello-board)) for the tasks, check your progress
 
 `cd ~/code/sasha17demin/hypopredict` (navigate into the project folder, check the pyenv == 'hyperpredict')
