@@ -20,6 +20,8 @@ From `master`
 
 ## CheatSheet
 
+D1Namo dataset: https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-data/data
+
 `git branch` -- show all your branches
 
 `git branch -D branch_name` -- deleting a branch
@@ -64,3 +66,9 @@ Suggested exploration tasks:
 2. Plot some of the things, understand it, try top merge it, pay attention to the time index
 3. Create some descriptive statistics and understand what they mean for time-series context: rolling Heart Rate for example, what does that mean in code?
 4. Read [this paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0325956) for an example architecture
+
+
+
+
+
+
