@@ -60,6 +60,8 @@ D1Namo dataset: https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-dat
    
 2.1. ADM: preprocess into features (raw or engineered? scaled? padded? cross-correlations?)
 
+      +  talk to your fav chat-bot about processing D1NAMO into features for your model
+
 2.2. J: Load ECG data to GCloud + Compress Acceleration and Breathing
 
 2.3. S: Update train_test_split.py: id HG events and chunk withing their past
