@@ -16,3 +16,8 @@ ipython
 pyarrow
 xgboost
 lightgbm
+
+
+#API
+fastapi
+uvicorn
