@@ -1,8 +1,18 @@
+<img src=https://i.pinimg.com/originals/6d/1e/2f/6d1e2ff4321a3656a26c2cdcee79fa8f.png width=400 img>
+
 ## Every Morning
 
-Check out our Workflow at Miro ([link](https://miro.com/welcomeonboard/WVNmaGNCMzlnK1FjbDlYc2tKK1F4T3Y3K0s4Tm13MnBSY2JibElneXFzK2tBM0FPWStINXRzSHdNY1JqMCs5a3ZvQy90NVZBV3dBT3JPMTFyTTBYcjFCQ1ZPVFl1dm5ScHRJUWFEZ01pS0t2eE4wdWJObzczUTJCSVRGbSttQkJhWWluRVAxeXRuUUgwWDl3Mk1qRGVRPT0hdjE=?share_link_id=462218411826))
+#### Tasks:
 
-Check our Trello board([link](https://trello.com/invite/b/6936dbc891a1f358b51364db/ATTIf0c9ea7c184b84ac2f053b107edc3b201355B91E/my-trello-board)) for the tasks, check your progress
+1. Check out our Workflow at Miro ([link](https://miro.com/welcomeonboard/WVNmaGNCMzlnK1FjbDlYc2tKK1F4T3Y3K0s4Tm13MnBSY2JibElneXFzK2tBM0FPWStINXRzSHdNY1JqMCs5a3ZvQy90NVZBV3dBT3JPMTFyTTBYcjFCQ1ZPVFl1dm5ScHRJUWFEZ01pS0t2eE4wdWJObzczUTJCSVRGbSttQkJhWWluRVAxeXRuUUgwWDl3Mk1qRGVRPT0hdjE=?share_link_id=462218411826))
+
+2. Check our Trello board([link](https://trello.com/invite/b/6936dbc891a1f358b51364db/ATTIf0c9ea7c184b84ac2f053b107edc3b201355B91E/my-trello-board)) for the tasks, check your progress
+
+3. Write down your own tasks
+
+---
+
+#### Updating the repo and package
 
 `cd ~/code/sasha17demin/hypopredict` (navigate into the project folder, check the pyenv == 'hyperpredict')
 
@@ -15,10 +25,22 @@ From `master`
 
 `pip install --upgrade pip`
 
-`pip install -r requirements.txt` [installing new packages that others found useful will save you time]
+**Instead of updating requirements, now we can just update our package `hypopre4dict`**
+
+If not installed yet:
+`pip install -e .` [installing in "editable" mode so that it will autoreload]
+
+If already installed:
+`make reinstall_package`
+
+Chekc installation: `pip freeze | grep hypopredict`
 
 
 ## CheatSheet
+
+GDrive: https://drive.google.com/drive/folders/1guvUI7XiGqdeLK-qmtjcYF9KlZBd2s3E?usp=share_link
+
+**TODO:** How to load files directly?
 
 D1Namo dataset: https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-data/data
 
@@ -26,9 +48,53 @@ D1Namo dataset: https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-dat
 
 `git branch -D branch_name` -- deleting a branch
 
+<br>
+
+---
+
+## Today: Day 3 (Wed Dec 10) -- <span style='color: red;'> WE MODEL </span>
+
+#### Before Lunch (11am-1pm)
+
+1. generate Chunk1 together
+   
+2.1. ADM: preprocess into features (raw or engineered? scaled? padded? cross-correlations?)
+
+2.2. J: Load ECG data to GCloud + Compress Acceleration and Breathing
+
+2.3. S: Update train_test_split.py: id HG events and chunk withing their past
+
+<br>
 
 
+#### After Lunch (2pm-6pm)
 
+1.1. A: Fit a Support Vector Classifier, return vector of predicted proba, and show test score
+
+1.2. D: Fit an LSTM+CNN, return vector of predicted proba, and show test score
+
+1.3. M: Fit: an XGBoost/LightGBM, return vector of predicted proba, and show test score
+
+1.4. S: API + Docker + stacking module + MLFlow?
+
+1.5. J: Model? TTS? MLOps?
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+---
+---
+---
+
+_In Search of Lost Time -- Previous Days_
 
 ## Day 2: Generate Some Features + Train Our First Models
 
