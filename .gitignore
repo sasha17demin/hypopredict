@@ -47,5 +47,6 @@ models/
 secrets.toml
 *.json
 
-# User defined extras
-# Complete to your desire
+
+# development notebooks
+*_dev.ipynb
