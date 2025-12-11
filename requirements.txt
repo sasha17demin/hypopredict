@@ -21,3 +21,8 @@ lightgbm
 #API
 fastapi
 uvicorn
+
+
+## CICD ##
+black
+pytest

@@ -97,3 +97,12 @@ docker_deploy:
 		--image $(DOCKER_IMAGE_PATH):prod \
 		--memory $(GAR_MEMORY) \
 		--region $(GCP_REGION)
+
+
+# CICD
+default: pylint pytest #Default functions if we just write "make"
+pylint:
+	find . -iname "*py" -not -path "./tests/*" | xargs -n1 -I {} pylint --output-format=colorized {}; true
+
+pytest:
+	PYTHONDONTWRITEBYTECODE=1 pytest -v --color=yes
