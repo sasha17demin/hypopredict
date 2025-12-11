@@ -52,6 +52,36 @@ D1Namo dataset: https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-dat
 
 ---
 
+## Today: Day 4 (Thu Dec 11) -- WE FINE-TUNE AND START TO FUSE
+
+#### Before Lunch (11am-2pm)
+
+1.
+
+<br>
+
+
+#### After Lunch (3pm-6pm)
+
+1. 
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+---
+---
+---
+
+_In Search of Lost Time -- Previous Days_
+
 ## Today: Day 3 (Wed Dec 10) -- <span style='color: red;'> WE MODEL </span>
 
 #### Before Lunch (11am-1pm)
@@ -82,21 +112,6 @@ D1Namo dataset: https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-dat
 1.5. J: Model? TTS? MLOps?
 
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
----
----
----
-
-_In Search of Lost Time -- Previous Days_
 
 ## Day 2: Generate Some Features + Train Our First Models
 
