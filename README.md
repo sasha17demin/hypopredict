@@ -54,6 +54,15 @@ D1Namo dataset: https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-dat
 
 ## Today: Day 4 (Thu Dec 11) -- WE FINE-TUNE AND START TO FUSE
 
+
+1. Chunking: train-test split
+2. Adding multiple features
+3. Cross-correlation: theory + check the data --> show on front-end
+4. Front-end? Showeing predictions? Log-in page? Sampling test subjects? Generating synthetic subjects?
+      4.1 get request to model + sliding window + sliding chunk size
+      4.2 => auto populate the graph
+6. For demo: 1 crazy test day-person, 1 normal test day-person
+
 #### Before Lunch (11am-2pm)
 
 1.
