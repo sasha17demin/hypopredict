@@ -8,6 +8,7 @@ matplotlib
 seaborn
 scikit-learn
 tensorflow
+multiprocessing
 
 
 jupyter
@@ -16,6 +17,9 @@ ipython
 pyarrow
 xgboost
 lightgbm
+
+# Feature Engineering
+neurokit2
 
 
 #API
