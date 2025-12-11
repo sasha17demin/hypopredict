@@ -17,6 +17,9 @@ pyarrow
 xgboost
 lightgbm
 
+# Feature Engineering
+neurokit2
+
 
 #API
 fastapi
