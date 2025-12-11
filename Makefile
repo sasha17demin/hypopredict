@@ -21,7 +21,7 @@ clean:
 
 ##################### API #####################
 run_api:
-	uvicorn hypopredict.api.app:app --reload --port 8000
+	uvicorn api.fast:app --reload --port 8000
 
 
 ##################### GCP #####################
