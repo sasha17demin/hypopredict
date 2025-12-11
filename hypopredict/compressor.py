@@ -173,7 +173,7 @@ def parse_compress_csv(file_path, signal_type):
     df.set_index("datetime", inplace=True)
     df.drop(columns=["Time"], inplace=True)
 
-    print(df.head())
+    print(df.info())
     return df
 
 
