@@ -8,6 +8,7 @@ matplotlib
 seaborn
 scikit-learn
 tensorflow
+multiprocessing
 
 
 jupyter
