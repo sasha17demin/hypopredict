@@ -1,5 +1,6 @@
 ## Data Folder
 d1_get_familiar/data/
+data_ecg/
 
 # Standard python ignores
 *.egg-info
@@ -25,6 +26,7 @@ raw_data/
 *.sqlite
 *.zip
 *.feather
+*.npy
 
 # Data in the package
 # Add files you want to include in the git repo using `git add -f file_name`
