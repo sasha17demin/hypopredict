@@ -36,29 +36,75 @@ def extract_features(chunks: list[pd.DataFrame]) -> pd.DataFrame:
 def extract_ecg_features(
     chunks: list[pd.DataFrame], 
     ecg_column: str = 'EcgWaveform',
-    sampling_rate: int = 250
+    sampling_rate: int = 250,
+    verbose: bool = True
 ) -> pd.DataFrame:
     """
-    Extracts ECG waveform features (time-domain statistics) from each chunk.
+    Extracts ECG waveform features (time-domain statistics and R-peak features) from each chunk.
     
     Args:
         chunks: List of DataFrames containing ECG data
         ecg_column: Name of the ECG column
         sampling_rate: Sampling rate of the ECG signal (Hz)
+        verbose: Whether to print progress
         
     Returns:
         DataFrame with ECG features for each chunk
     """
+    import numpy as np
+    
     feature_rows = []
-    for chunk in chunks:
-        ecg_signal = chunk[ecg_column]
+    for i, chunk in enumerate(chunks):
+        if verbose:
+            print(f"Extracting ECG features: chunk {i+1}/{len(chunks)}")
         
-        stats = pd.Series({
-            "mean_ecg": ecg_signal.mean(),
-            "std_ecg": ecg_signal.std(),
-            "min_ecg": ecg_signal.min(),
-            "max_ecg": ecg_signal.max(),
-        })
+        try:
+            ecg_signal = chunk[ecg_column]
+            ecg_cleaned = nk.ecg_clean(ecg_signal, sampling_rate=sampling_rate)
+            
+            # Extract R-peaks
+            rpeaks = nk.ecg_peaks(ecg_cleaned, sampling_rate=sampling_rate)[1]
+            rpeak_indices = rpeaks['ECG_R_Peaks']
+            
+            # Calculate RR intervals (in milliseconds)
+            rr_intervals = np.diff(rpeak_indices) / sampling_rate * 1000
+            
+            # Calculate heart rate (bpm)
+            heart_rates = 60000 / rr_intervals if len(rr_intervals) > 0 else np.array([np.nan])
+            
+            stats = pd.Series({
+                # Basic ECG statistics
+                "mean_ecg": ecg_signal.mean(),
+                "std_ecg": ecg_signal.std(),
+                "min_ecg": ecg_signal.min(),
+                "max_ecg": ecg_signal.max(),
+                # R-peak features
+                "num_rpeaks": len(rpeak_indices),
+                "mean_rr_interval": np.mean(rr_intervals) if len(rr_intervals) > 0 else np.nan,
+                "std_rr_interval": np.std(rr_intervals) if len(rr_intervals) > 0 else np.nan,
+                # Heart rate features
+                "mean_heart_rate": np.mean(heart_rates),
+                "std_heart_rate": np.std(heart_rates),
+                "min_heart_rate": np.min(heart_rates),
+                "max_heart_rate": np.max(heart_rates),
+            })
+        except Exception as e:
+            if verbose:
+                print(f"Error processing chunk {i}: {e}")
+            stats = pd.Series({
+                "mean_ecg": np.nan,
+                "std_ecg": np.nan,
+                "min_ecg": np.nan,
+                "max_ecg": np.nan,
+                "num_rpeaks": np.nan,
+                "mean_rr_interval": np.nan,
+                "std_rr_interval": np.nan,
+                "mean_heart_rate": np.nan,
+                "std_heart_rate": np.nan,
+                "min_heart_rate": np.nan,
+                "max_heart_rate": np.nan,
+            })
+        
         feature_rows.append(stats)
 
     return pd.DataFrame(feature_rows)
