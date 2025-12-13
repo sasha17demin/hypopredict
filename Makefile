@@ -3,6 +3,7 @@
 reinstall_package:
 	@pip uninstall -y hypopredict || :
 	@pip install -e .
+	@pip freeze | grep hypopredict
 
 
 ##################### CLEANING #####################

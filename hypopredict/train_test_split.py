@@ -1,13 +1,32 @@
 import pandas as pd
 import numpy as np
 
+from hypopredict.person import Person
+
 
 def hello():    return "Hello from hypopredict.train_test_split module!!"
 
 # split sendsor data into overlapping chunks of CHUNK_SIZE every STEP_SIZE seconds
 
 
-def chunkify(df: pd.DataFrame, chunk_size: int, step_size: int) -> list[pd.DataFrame]:
+
+
+def chunkify_day(person_day: int,
+                 #chunk_size: pd.Timedelta,
+                 #step_size: pd.Timedelta,
+                 ecg_dir: str) -> list[dict]:
+
+    ID = str(person_day)[0]
+
+    person = Person(ID, ecg_dir=ecg_dir)
+
+    return [{'test':person}]
+
+
+
+def chunkify_df(df: pd.DataFrame,
+                chunk_size: pd.Timedelta,
+                step_size: pd.Timedelta) -> list[pd.DataFrame]:
     """
     Function that splits sensor df (ECG, Breathing, Accelaration)
     into overlapping chunks to generate X_train.
@@ -21,6 +40,9 @@ def chunkify(df: pd.DataFrame, chunk_size: int, step_size: int) -> list[pd.DataF
     """
 
     chunks = []
+    df_sampling_rate = 1 / (df.index[1] - df.index[0]).total_seconds()  # in Hz (assumes uniform sampling)
+    chunk_size = int(chunk_size.total_seconds() * df_sampling_rate)  # convert to number of samples
+    step_size = int(step_size.total_seconds() * df_sampling_rate)  # convert to number of samples
 
     # take the starting index from 0 to the end of the dataframe with step size slide
     for start in range(0, df.shape[0], step_size):
