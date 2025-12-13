@@ -52,3 +52,4 @@ secrets.toml
 
 # development notebooks
 *_dev.ipynb
+hypopredict/dev
