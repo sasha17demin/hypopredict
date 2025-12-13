@@ -68,13 +68,16 @@ class CV_splitter:
 
         return splits
 
-    def validate(self, splits: np.ndarray, verbose: bool = False) -> tuple:
+    def validate(self, splits: np.ndarray,
+                 verbose: bool = False,
+                 warning: bool = True) -> tuple:
         """
         Ensure each split has HG event, i.e. mean(is_HG) > 0
         Args:
             splits: np.ndarray of shape (n_splits, split_size)
                     each row is a split containing days
             verbose: whether to print validation logs
+            warning: whether to print warnings for ECG days in multiple files
         Returns:
             checks: list of booleans indicating whether each split is valid
             props: list of proportions of HG events in each split
@@ -87,7 +90,7 @@ class CV_splitter:
             print(f"Validating split: {split}")
 
             # within split, apply _HG_prop_with_ECG to each day
-            split_HG_by_day = list(map(lambda day: self._HG_prop_with_ECG(day), split))
+            split_HG_by_day = list(map(lambda day: self._HG_prop_with_ECG(day, warning=warning), split))
             # then take mean proportion across days in split
             split_hg_prop = np.mean(split_HG_by_day).round(4)
             props.append(split_hg_prop)
@@ -101,16 +104,19 @@ class CV_splitter:
                     print(f"\nSplit {split} is valid with {split_hg_prop*100}% of y == 1\n")
                 elif split_hg_prop == 0:
                     print(f"\nZERO SPLIT {split}: zero HG events, no y == 1 in this split\n")
+#########################
+# TODO: handle this case in training? resample splits?
                 else:
                     # find index of day with -100.0 proportion
                     invalid_day_idx = split_HG_by_day.index(-100.0)
                     invalid_day = split[invalid_day_idx]
                     print(f"\nINVALID SPLIT {split}: missing glucose measures for ECG on day {invalid_day}\n")
 
-        return checks, props
+        return checks, np.array(props)
 
     def _HG_prop_with_ECG(self, day: int,
-                          verbose: bool = False) -> float:
+                          verbose: bool = False,
+                          warning: bool = True) -> float:
         """
         For a given day, compute proportion of hypoglycemic events
         among glucose samples that have corresponding ECG records
@@ -153,7 +159,7 @@ class CV_splitter:
         person[ecg_day] = pd.DataFrame()
         ecg_day_paths = self._load_day(day)
 
-        if len(ecg_day_paths) > 1:
+        if len(ecg_day_paths) > 1 and warning:
             print(
                 f"""
     WARNING: there were multiple files for day _{day}_ => there might be a gap in concatinated ecg index so when you check if HG events actually ahppened during recorded ECG times check for this gap
