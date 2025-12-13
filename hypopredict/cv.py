@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 
 import hypopredict.compressor as comp
+from hypopredict.person import Person
 
 import os
 
@@ -128,55 +129,23 @@ class CV_splitter:
                               among glucose samples that have corresponding ECG records
         """
 
-        ID = int(day // 10)
-        person = {"ID": ID}
+        ID = str(day)[0]  # person ID is first digit of day identifier
+        person = Person(ID, ecg_dir=self.ecg_dir)
 
         # SIGNAL_TYPE = "EcgWaveform"
         # RAW_DATA_DIR = '../data/feathers'
 
+        person.load_HG_data(glucose_src=self.glucose_src)
 
-
-        if self.glucose_src == "gdrive":
-            person['glucose'] = comp.gdrive_to_pandas(comp.GLUCOSE_ID_LINKS[ID-1])
-
-        if self.glucose_src == "local":
-            # GLUCOSE_PATH = '/Users/alexxela/code/hypopredict/data/dbt-glucose/'
-            # load it from .env file
-            GLUCOSE_PATH = os.getenv('GLUCOSE_PATH')
-            # join with formatted filename
-            GLUCOSE_PATH_ID = os.path.join(GLUCOSE_PATH, f'glucose_person{ID}.feather')
-
-            person["glucose"] = pd.read_feather(GLUCOSE_PATH_ID)
-
-        # identify hg events for that person
-        person["hg_events"] = comp.identify_hg_events(
-            person["glucose"], min_duration=15, threshold=3.9
-        )
-
-        # create a key for ecg of that day
-        ecg_day = f"ecg_{str(day)[1]}" # ecg_3 for day 73
-        # concatinate all ecg files for that day
-        person[ecg_day] = pd.DataFrame()
-        ecg_day_paths = self._load_day(day)
-
-        if len(ecg_day_paths) > 1 and warning:
-            print(
-                f"""
-    WARNING: there were multiple files for day _{day}_ => there might be a gap in concatinated ecg index so when you check if HG events actually ahppened during recorded ECG times check for this gap
-    Files concatinated:
-                """,
-                ecg_day_paths
-            )
-
-        for path in ecg_day_paths:
-            df = pd.read_feather(path)
-            person[ecg_day] = pd.concat([person[ecg_day], df])
+        # second number in day is day of recording for that person
+        day_str = str(day)[1]
+        person.load_ECG_day(day_str, warning=warning)
 
         # subset hg_events to ECG start and end time
 ###############################
 # TODO: what if there are multiple files for that day? handle gaps?
-        hg_events_w_ecg = person["hg_events"].loc[
-            person[ecg_day].index.min() : person[ecg_day].index.max()
+        hg_events_w_ecg = person.hg_events.loc[
+            person.ecg[int(day_str)].index.min() : person.ecg[int(day_str)].index.max()
         ]
 ###############################
 # TODO: identified days with no glucose measures for ECG
@@ -191,7 +160,7 @@ class CV_splitter:
             print(
                 "\nProportion of HG glucose level among ALL glucose samples for this person-day"
             )
-            print(np.mean(person["hg_events"]["is_hg"] == 1).round(2))
+            print(np.mean(person.hg_events["is_hg"] == 1).round(2))
             print(
                 """
         Proportion of HG glucose level among SUBSET glucose samples
@@ -200,21 +169,3 @@ class CV_splitter:
             print(round(hg_prop_with_ecg, 2))
 
         return hg_prop_with_ecg
-
-
-    def _load_day(self, day: int) -> list:
-        """
-        Load all ECG feather file paths for a given day
-        Args:
-            day: int, day identifier (e.g. 73 = person 7 day 3)
-        Returns:
-            f_paths: list of file paths for ECG data for that day
-        """
-
-        f_paths = []
-        for root, dirs, files in os.walk(self.ecg_dir):
-            for file in files:
-                if file.startswith(f"EcgWaveform-{str(day)}"):
-                    f_paths.append(os.path.join(root, file))
-
-        return f_paths
