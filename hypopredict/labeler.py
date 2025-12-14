@@ -10,6 +10,35 @@ from hypopredict.core.person import Person
 #### We know how to generate label for 1 chunk
 ### Refactor -> function: list[chunks] --> list[labels]
 
+def label_split(split_chunkified,
+                glucose_src='local',
+                forecast_window=pd.Timedelta(minutes=30)):
+    """Generate labels for all chunks in a split.
+
+    Args:
+        split_chunkified: dict of day -> list of (chunk_start_time, chunk_end_time)
+        glucose_src: str, source of glucose data
+        forecast_window: pd.Timedelta, length of forecast window after chunk end time
+
+    Returns:
+        np.array of labels for each chunk in the split
+    """
+
+    split_labels = dict()
+
+    # for each day in the split
+    for day, chunks in split_chunkified.items():
+        print(f"Labeling day {day} with {len(chunks)} chunks")
+
+        split_labels[day] = label_day(day=day,
+                                        chunks=chunks,
+                                        forecast_window=forecast_window,
+                                        glucose_src=glucose_src)
+
+    return split_labels
+
+
+
 
 def label_day(day: int,
               chunks: list[pd.DataFrame],

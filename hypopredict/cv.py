@@ -70,7 +70,7 @@ class CV_splitter:
 
         splits = np.array_split(shuffled_days, self.n_splits)
 
-        return splits
+        return np.array(splits)
 
     def validate(self, splits: np.ndarray,
                  verbose: bool = False,
