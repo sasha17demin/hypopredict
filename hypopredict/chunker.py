@@ -21,7 +21,7 @@ def chunkify(person_days: list[int],
                                     step_size=step_size,
                                     ecg_dir=ecg_dir
                             )
-        chunks_all_days[person_day] = chunks_person_day
+        chunks_all_days[int(person_day)] = chunks_person_day
 
     return chunks_all_days
 
@@ -89,45 +89,45 @@ def chunkify_df(df: pd.DataFrame,
 
 
 
-###### getting HG onset times ######
+# ###### getting HG onset times ######
 
 
 
-# TODO: HG event is (a) glucose < 3.9 and (b) lasts for at least 15 minutes
-# currently only (a) is implemented
-# TODO: unique event identifier across subjects
-# to make sure we don't include the same event in train and test
+# # TODO: HG event is (a) glucose < 3.9 and (b) lasts for at least 15 minutes
+# # currently only (a) is implemented
+# # TODO: unique event identifier across subjects
+# # to make sure we don't include the same event in train and test
 
 
-def get_HG_onset_times(glucose_df: pd.DataFrame, threshold: float = 3.9) -> list:
-    """
-    Function that gets the onset times of hypoglycemia events
-    from the glucose dataframe.
+# def get_HG_onset_times(glucose_df: pd.DataFrame, threshold: float = 3.9) -> list:
+#     """
+#     Function that gets the onset times of hypoglycemia events
+#     from the glucose dataframe.
 
-    Args:
-        glucose_df: pd.DataFrame - dataframe with glucose data
-                    Should have 'glucose' column and datetime index
+#     Args:
+#         glucose_df: pd.DataFrame - dataframe with glucose data
+#                     Should have 'glucose' column and datetime index
 
-        threshold: float - glucose threshold for hypoglycemia
+#         threshold: float - glucose threshold for hypoglycemia
 
-    Returns:
-        list of pd.Timestamp - list of onset times
-    """
+#     Returns:
+#         list of pd.Timestamp - list of onset times
+#     """
 
-    times = glucose_df[glucose_df['glucose'] <= threshold].index
-    #times = pd.to_datetime(times, format='%Y-%m-%d %H:%M:%S:%f')
+#     times = glucose_df[glucose_df['glucose'] <= threshold].index
+#     #times = pd.to_datetime(times, format='%Y-%m-%d %H:%M:%S:%f')
 
-    times_onset = []
-    prev_time = None
+#     times_onset = []
+#     prev_time = None
 
-    for time in times:
-        # Check if this time is at least 5 minutes after the last recorded onset
-        # that means it's a new onset
-        if prev_time is None or (time - prev_time) > pd.Timedelta(minutes=5):
-            times_onset.append(time)
-        prev_time = time
+#     for time in times:
+#         # Check if this time is at least 5 minutes after the last recorded onset
+#         # that means it's a new onset
+#         if prev_time is None or (time - prev_time) > pd.Timedelta(minutes=5):
+#             times_onset.append(time)
+#         prev_time = time
 
-    return times_onset
+#     return times_onset
 
 
 
@@ -139,7 +139,7 @@ def get_HG_onset_times(glucose_df: pd.DataFrame, threshold: float = 3.9) -> list
 
 # target label is 1 if NEXT chunk contains any of the onset times
 
-#       1       0       0       0       0
+#       1       1       0       0       0
 #           |  ot   |       |       |       |
 #           |       |       |       |       |
 #     chunk1  chunk2  chunk3  chunk4  chunk5
