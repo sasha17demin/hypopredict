@@ -9,8 +9,8 @@ and shuffling between people
 import pandas as pd
 import numpy as np
 
-import hypopredict.compressor as comp
-from hypopredict.person import Person
+from hypopredict.data import labels
+from hypopredict.core import Person
 
 import os
 
