@@ -1,12 +1,14 @@
-from setuptools import find_packages
+from setuptools import __version__, find_packages
 from setuptools import setup
+
+from hypopredict import __version__
 
 with open("requirements.txt") as f:
     content = f.readlines()
 requirements = [x.strip() for x in content if "git+" not in x]
 
 setup(name='hypopredict',
-      version="0.1",
+      version=__version__,
       description="HypoPredict Module",
       license="MIT",
       author="HypoPredict Team",
