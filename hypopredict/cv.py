@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 
 import hypopredict.compressor as comp
-from hypopredict.person import Person
+from hypopredict.core.person import Person
 
 import os
 
@@ -40,6 +40,9 @@ class CV_splitter:
         self.ecg_dir = ecg_dir
         self.glucose_src = glucose_src
 
+        if self.glucose_src == 'local':
+            assert os.getenv('GLUCOSE_PATH') is not None, "Set GLUCOSE_PATH environment variable for local glucose data"
+
         # self.fold_size = np.ceil(len(days)/n_splits).astype(int)
 
 
@@ -67,7 +70,7 @@ class CV_splitter:
 
         splits = np.array_split(shuffled_days, self.n_splits)
 
-        return splits
+        return np.array(splits)
 
     def validate(self, splits: np.ndarray,
                  verbose: bool = False,

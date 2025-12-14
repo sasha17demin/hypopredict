@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from tensorflow import keras
 from fastapi.middleware.cors import CORSMiddleware
 #Our Stuff
-from hypopredict.train_test_split import hello
+from hypopredict.chunker import hello
 import api.utils as utils
 
 app = FastAPI()
