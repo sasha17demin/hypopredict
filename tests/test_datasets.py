@@ -22,20 +22,28 @@ class TestPanelDataset(unittest.TestCase):
         """Set up test data."""
         from hypopredict.datasets.panel_dataset import PanelDataset
         self.PanelDataset = PanelDataset
-        
+
         # Create mock chunks
         self.chunks = []
         self.labels = []
         self.person_days = []
-        
-        for i in range(10):
+
+        # Use explicit constants for test data generation
+        num_samples = 10
+        max_person_id = 3
+        max_day = 6
+
+        for i in range(num_samples):
             dates = pd.date_range('2023-01-01', periods=100, freq='4ms')
             chunk = pd.DataFrame({
                 'EcgWaveform': np.random.randn(100)
             }, index=dates)
             self.chunks.append(chunk)
             self.labels.append(i % 2)  # Alternate 0, 1
-            self.person_days.append(PersonDay(i % 3 + 1, i % 6 + 1))
+            # Create PersonDay with explicit calculation
+            person_id = (i % max_person_id) + 1
+            day = (i % max_day) + 1
+            self.person_days.append(PersonDay(person_id, day))
     
     def test_dataset_creation(self):
         """Test creating a PanelDataset."""

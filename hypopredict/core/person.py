@@ -83,7 +83,6 @@ class Person:
 
         # Free up memory by deleting raw glucose data
         del self.glucose_data
-        self.glucose_data = None
 
     def load_ECG_day(
         self,

@@ -13,8 +13,10 @@ class TestChunking(unittest.TestCase):
     
     def test_chunkify_df_basic(self):
         """Test basic chunking of a DataFrame."""
-        # Create mock ECG data
-        dates = pd.date_range('2023-01-01', periods=1000, freq='4ms')  # 250 Hz
+        # Create mock ECG data at 250 Hz sampling rate
+        sampling_rate_hz = 250
+        period_ms = int(1000 / sampling_rate_hz)  # 4ms at 250 Hz
+        dates = pd.date_range('2023-01-01', periods=1000, freq=f'{period_ms}ms')
         ecg_data = pd.DataFrame({
             'EcgWaveform': np.random.randn(1000)
         }, index=dates)

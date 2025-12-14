@@ -27,35 +27,42 @@ class FusionNN(nn.Module):
         hidden_dim: int = 128,
         num_classes: int = 2,
         dropout: float = 0.3,
-        use_attention: bool = False
+        use_attention: bool = False,
+        cnn_channels: tuple = (32, 64),
+        cnn_kernels: tuple = (7, 5, 3)
     ):
         """
         Initialize FusionNN.
-        
+
         Args:
             ecg_input_dim: Input dimension for ECG encoder
             hidden_dim: Hidden dimension for encoders and fusion
             num_classes: Number of output classes (2 for binary classification)
             dropout: Dropout rate for regularization
             use_attention: Whether to use attention mechanism in fusion
+            cnn_channels: Tuple of channel dimensions for CNN layers (default: (32, 64))
+            cnn_kernels: Tuple of kernel sizes for CNN layers (default: (7, 5, 3))
         """
         super(FusionNN, self).__init__()
-        
+
         self.ecg_input_dim = ecg_input_dim
         self.hidden_dim = hidden_dim
         self.num_classes = num_classes
         self.dropout = dropout
         self.use_attention = use_attention
-        
-        # ECG encoder (1D CNN for temporal patterns)
+
+        # ECG encoder (1D CNN for temporal patterns) with configurable architecture
         self.ecg_encoder = nn.Sequential(
-            nn.Conv1d(1, 32, kernel_size=7, padding=3),
+            nn.Conv1d(1, cnn_channels[0], kernel_size=cnn_kernels[0],
+                     padding=cnn_kernels[0]//2),
             nn.ReLU(),
             nn.MaxPool1d(2),
-            nn.Conv1d(32, 64, kernel_size=5, padding=2),
+            nn.Conv1d(cnn_channels[0], cnn_channels[1], kernel_size=cnn_kernels[1],
+                     padding=cnn_kernels[1]//2),
             nn.ReLU(),
             nn.MaxPool1d(2),
-            nn.Conv1d(64, hidden_dim, kernel_size=3, padding=1),
+            nn.Conv1d(cnn_channels[1], hidden_dim, kernel_size=cnn_kernels[2],
+                     padding=cnn_kernels[2]//2),
             nn.ReLU(),
             nn.AdaptiveAvgPool1d(1)
         )
