@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from tensorflow import keras
 from fastapi.middleware.cors import CORSMiddleware
 #Our Stuff
-from hypopredict.train_test_split import hello
+from hypopredict.features.chunking import chunkify
 import api.utils as utils
 
 app = FastAPI()
@@ -26,10 +26,12 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    message = hello()
+    message = "Hello from HypoPredict API!"
     return {
-        "message": message
-        }
+        "message": message,
+        "version": "0.2.0",
+        "status": "restructured"
+    }
 
 
 @app.post("/predict_from_url")
