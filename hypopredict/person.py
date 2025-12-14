@@ -57,8 +57,7 @@ class Person:
             self.ecg_dir: str, directory where ECG data files are stored
         """
 
-        if type(day) == str:
-            day = int(day)
+        day = int(day)
 
         # concatinate all ecg files for that day
         self.ecg[day] = pd.DataFrame()

@@ -8,19 +8,43 @@ def hello():    return "Hello from hypopredict.train_test_split module!!"
 
 # split sendsor data into overlapping chunks of CHUNK_SIZE every STEP_SIZE seconds
 
+def chunkify(person_days: list[int],
+            chunk_size: pd.Timedelta,
+            step_size: pd.Timedelta,
+            ecg_dir: str) -> dict[int, list[pd.DataFrame]]:
+
+    chunks_all_days = {}
+    for person_day in person_days:
+        person_day, chunks_person_day = chunkify_day(
+                                    person_day,
+                                    chunk_size=chunk_size,
+                                    step_size=step_size,
+                                    ecg_dir=ecg_dir
+                            )
+        chunks_all_days[person_day] = chunks_person_day
+
+    return chunks_all_days
 
 
 
 def chunkify_day(person_day: int,
-                 #chunk_size: pd.Timedelta,
-                 #step_size: pd.Timedelta,
-                 ecg_dir: str) -> list[dict]:
+                 chunk_size: pd.Timedelta,
+                 step_size: pd.Timedelta,
+                 ecg_dir: str) -> tuple[int, list[pd.DataFrame]]:
 
-    ID = str(person_day)[0]
+    ID = person_day // 10
 
     person = Person(ID, ecg_dir=ecg_dir)
 
-    return [{'test':person}]
+    person.load_ECG_day(day=person_day%10)
+
+    chunks_person_day = chunkify_df(
+                                person.ecg[person_day%10],
+                                chunk_size=chunk_size,
+                                step_size=step_size
+                        )
+
+    return person_day, chunks_person_day
 
 
 
