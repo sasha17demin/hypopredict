@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from hypopredict.person import Person
+from hypopredict.core.person import Person
 
 
 def hello():    return "Hello from hypopredict.train_test_split module!!"

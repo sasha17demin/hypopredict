@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 
 import hypopredict.compressor as comp
-from hypopredict.person import Person
+from hypopredict.core.person import Person
 
 import os
 
