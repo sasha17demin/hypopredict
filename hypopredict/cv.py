@@ -8,11 +8,15 @@ and shuffling between people
 
 import pandas as pd
 import numpy as np
+import os
 
+from hypopredict import chunker, labeler
 import hypopredict.compressor as comp
 from hypopredict.core.person import Person
+import hypopredict.chunk_preproc as cp
+from hypopredict.new_features import prepare_X_y
 
-import os
+
 
 
 class CV_splitter:
@@ -172,3 +176,127 @@ class CV_splitter:
             print(round(hg_prop_with_ecg, 2))
 
         return hg_prop_with_ecg
+
+
+
+
+class CrossValidator:
+    """
+    Class to perform cross-validation using CV_splitter
+    """
+
+    def __init__(self,
+                 splits: np.ndarray):
+        self.splits = splits
+
+    def chunkify_label_stack(self,
+                            chunk_size: pd.Timedelta,
+                            step_size: pd.Timedelta,
+                            ecg_dir: str,
+                            forecast_window: pd.Timedelta,
+                            roll_window_size: pd.Timedelta,
+                            roll_step_size: pd.Timedelta,
+                            suffix: str,
+                            glucose_src: 'local' or 'gdrive' = 'gdrive',
+                            agg_funcs: list = ['mean', 'std', 'min', 'max']):
+
+
+        # turn splits into prepped (X, y) pairs
+        splits_prepped = []
+        # this way we only feature-engineer once per split, not once per CV iteration
+        for i in range(len(self.splits)):
+            ##############################
+            SPLIT_INDEX = i
+            ##############################
+            # take the split
+            SPLIT = self.splits[SPLIT_INDEX]
+            # chunkify
+            split_chunkified = chunker.chunkify(SPLIT.ravel(),
+                                                chunk_size=chunk_size,
+                                                step_size=step_size,
+                                                ecg_dir=ecg_dir)
+            # label chunks
+            split_labels = labeler.label_split(split_chunkified,
+                                                    glucose_src=glucose_src,
+                                                    forecast_window=forecast_window)
+            # validate and stack
+            chunks_split, y_split = cp.filter_and_stack(
+                                        split_chunkified, split_labels
+                                    )
+            # prepare X, y with rolling features
+########################
+# TODO: make prepare_X_y part of model class and argument here
+            # that should be model's @classmethod preprocess
+            X_split, y_split = prepare_X_y(chunks_split,
+                                        y_split,
+                                        roll_window_size=roll_window_size,
+                                        roll_step_size=roll_step_size,
+                                        suffix='roll_15m') # type: ignore ################ TODO: suffix
+            # save for iterative CV
+            splits_prepped.append((X_split, y_split))
+
+        self.splits_prepped = splits_prepped
+
+        return splits_prepped
+
+
+
+    def _get_split_mean_labels(self,
+                               splits_prepped: list) -> list:
+        extr = lambda x: np.mean(splits_prepped[x][1])
+        n_splits = len(splits_prepped)
+        return list(map(extr, range(n_splits)))
+
+
+
+
+        # collect val PR-AUCs
+    from sklearn.metrics import precision_recall_curve, auc
+    # collect val average precision scores
+    from sklearn.metrics import average_precision_score
+
+    def validate_model_cv(self,
+                          model,
+                          splits_prepped: list) -> dict:
+        """
+        Perform cross-validation and collect validation PR-AUCs
+        Args:
+            model: a scikit-learn compatible model with fit and predict_proba methods
+            splits_prepped: list of (X, y) tuples for each split
+        Returns:
+            val_pr_aucs: list of validation PR-AUCs for each split
+            val_ave_precisions: list of validation average precision scores for each split
+        """
+
+         # collect val PR-AUCs
+         # from sklearn.metrics import precision_recall_curve, auc
+         # collect val average precision scores
+         # from sklearn.metrics import average_precision_score
+        val_pr_aucs = []
+        val_ave_precisions = []
+
+        for VAL_SPLIT_INDEX in range(len(splits_prepped)):
+
+            X_val, y_val = splits_prepped[VAL_SPLIT_INDEX]
+
+            # stack X_trains from other splits
+            X_train = pd.concat([splits_prepped[i][0] for i in range(len(splits_prepped)) if i != VAL_SPLIT_INDEX])
+            y_train = np.hstack([splits_prepped[i][1] for i in range(len(splits_prepped)) if i != VAL_SPLIT_INDEX])
+
+            # fit model
+            model.fit(X_train, y_train)
+            # predict probabilities
+            y_probs = model.predict_proba(X_val)[:, 1]
+            # compute PR-AUC
+
+            precision, recall, _ = precision_recall_curve(y_val, y_probs)
+            pr_auc = auc(recall, precision)
+            val_pr_aucs.append(pr_auc)
+            ave_precision = average_precision_score(y_val, y_probs)
+            val_ave_precisions.append(ave_precision)
+            print(f"Split {VAL_SPLIT_INDEX+1} PR-AUC: {pr_auc:.4f}, Average Precision: {ave_precision:.4f}")
+
+        return {
+            'val_pr_aucs': val_pr_aucs,
+            'val_ave_precisions': val_ave_precisions
+        }
