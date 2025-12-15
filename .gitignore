@@ -2,6 +2,8 @@
 d1_get_familiar/data/
 data_ecg/
 data_ecg.zip
+data_ecg_FINAL/
+data_ecg_FINAL.zip
 
 # Standard python ignores
 *.egg-info
