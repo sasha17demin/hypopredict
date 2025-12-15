@@ -21,8 +21,6 @@ import hypopredict.chunk_preproc as cp
 from hypopredict.new_features import prepare_X_y
 
 
-
-
 class CV_splitter:
     """
     Class that handles train-validation splitting for cross-validation.
@@ -33,28 +31,29 @@ class CV_splitter:
                     as well as list of proportions of HG events in each split
     """
 
-    def __init__(self,
-                 ecg_dir: str,
-                 glucose_src: str = "local" or "gdrive",
-                 n_splits: int = 5, random_state: int = 17):
+    def __init__(
+        self,
+        ecg_dir: str,
+        glucose_src: str = "local" or "gdrive",
+        n_splits: int = 5,
+        random_state: int = 17,
+    ):
         """
 
         n_splits: number of cross-validation splits. Total number of days should divisible by n_splits
         """
-
 
         self.n_splits = n_splits
         self.random_state = random_state
         self.ecg_dir = ecg_dir
         self.glucose_src = glucose_src
 
-        if self.glucose_src == 'local':
-            assert os.getenv('GLUCOSE_PATH') is not None, "Set GLUCOSE_PATH environment variable for local glucose data"
+        if self.glucose_src == "local":
+            assert (
+                os.getenv("GLUCOSE_PATH") is not None
+            ), "Set GLUCOSE_PATH environment variable for local glucose data"
 
         # self.fold_size = np.ceil(len(days)/n_splits).astype(int)
-
-
-
 
     def get_splits(self, days: list) -> np.ndarray:
         """
@@ -68,9 +67,7 @@ class CV_splitter:
 
         self.days = np.array(sorted(days))
         # deduce unique people IDs from days
-        self.people = np.unique(
-            np.array([int(day) // 10 for day in self.days])
-        )
+        self.people = np.unique(np.array([int(day) // 10 for day in self.days]))
 
         np.random.seed(self.random_state)
 
@@ -80,9 +77,9 @@ class CV_splitter:
 
         return np.array(splits)
 
-    def validate(self, splits: np.ndarray,
-                 verbose: bool = False,
-                 warning: bool = True) -> tuple:
+    def validate(
+        self, splits: np.ndarray, verbose: bool = False, warning: bool = True
+    ) -> tuple:
         """
         Ensure each split has HG event, i.e. mean(is_HG) > 0
         Args:
@@ -102,7 +99,9 @@ class CV_splitter:
             print(f"Validating split: {split}")
 
             # within split, apply _HG_prop_with_ECG to each day
-            split_HG_by_day = list(map(lambda day: self._HG_prop_with_ECG(day, warning=warning), split))
+            split_HG_by_day = list(
+                map(lambda day: self._HG_prop_with_ECG(day, warning=warning), split)
+            )
             # then take mean proportion across days in split
             split_hg_prop = np.mean(split_HG_by_day).round(4)
             props.append(split_hg_prop)
@@ -113,22 +112,28 @@ class CV_splitter:
 
             if verbose:
                 if split_hg_prop > 0:
-                    print(f"\nSplit {split} is valid with {split_hg_prop*100}% of y == 1\n")
+                    print(
+                        f"\nSplit {split} is valid with {split_hg_prop*100}% of y == 1\n"
+                    )
                 elif split_hg_prop == 0:
-                    print(f"\nZERO SPLIT {split}: zero HG events, no y == 1 in this split\n")
-#########################
-# TODO: handle this case in training? resample splits?
+                    print(
+                        f"\nZERO SPLIT {split}: zero HG events, no y == 1 in this split\n"
+                    )
+                #########################
+                # TODO: handle this case in training? resample splits?
                 else:
                     # find index of day with -100.0 proportion
                     invalid_day_idx = split_HG_by_day.index(-100.0)
                     invalid_day = split[invalid_day_idx]
-                    print(f"\nINVALID SPLIT {split}: missing glucose measures for ECG on day {invalid_day}\n")
+                    print(
+                        f"\nINVALID SPLIT {split}: missing glucose measures for ECG on day {invalid_day}\n"
+                    )
 
         return checks, np.array(props)
 
-    def _HG_prop_with_ECG(self, day: int,
-                          verbose: bool = False,
-                          warning: bool = True) -> float:
+    def _HG_prop_with_ECG(
+        self, day: int, verbose: bool = False, warning: bool = True
+    ) -> float:
         """
         For a given day, compute proportion of hypoglycemic events
         among glucose samples that have corresponding ECG records
@@ -153,13 +158,13 @@ class CV_splitter:
         person.load_ECG_day(day_str, warning=warning)
 
         # subset hg_events to ECG start and end time
-###############################
-# TODO: what if there are multiple files for that day? handle gaps?
+        ###############################
+        # TODO: what if there are multiple files for that day? handle gaps?
         hg_events_w_ecg = person.hg_events.loc[
             person.ecg[int(day_str)].index.min() : person.ecg[int(day_str)].index.max()
         ]
-###############################
-# TODO: identified days with no glucose measures for ECG
+        ###############################
+        # TODO: identified days with no glucose measures for ECG
         if hg_events_w_ecg.size == 0:
 
             hg_prop_with_ecg = -100.0  # indicate no glucose measures for that day
@@ -182,28 +187,26 @@ class CV_splitter:
         return hg_prop_with_ecg
 
 
-
-
 class CrossValidator:
     """
     Class to perform cross-validation using CV_splitter
     """
 
-    def __init__(self,
-                 splits: np.ndarray):
+    def __init__(self, splits: np.ndarray):
         self.splits = splits
 
-    def chunkify_label_stack(self,
-                            chunk_size: pd.Timedelta,
-                            step_size: pd.Timedelta,
-                            ecg_dir: str,
-                            forecast_window: pd.Timedelta,
-                            roll_window_size: pd.Timedelta,
-                            roll_step_size: pd.Timedelta,
-                            suffix: str,
-                            glucose_src: 'local' or 'gdrive' = 'gdrive',
-                            agg_funcs: list = ['mean', 'std', 'min', 'max']):
-
+    def chunkify_label_stack(
+        self,
+        chunk_size: pd.Timedelta,
+        step_size: pd.Timedelta,
+        ecg_dir: str,
+        forecast_window: pd.Timedelta,
+        roll_window_size: pd.Timedelta,
+        roll_step_size: pd.Timedelta,
+        suffix: str,
+        glucose_src: "local" or "gdrive" = "gdrive",
+        agg_funcs: list = ["mean", "std", "min", "max"],
+    ):
 
         # turn splits into prepped (X, y) pairs
         splits_prepped = []
@@ -215,28 +218,32 @@ class CrossValidator:
             # take the split
             SPLIT = self.splits[SPLIT_INDEX]
             # chunkify
-            split_chunkified = chunker.chunkify(SPLIT.ravel(),
-                                                chunk_size=chunk_size,
-                                                step_size=step_size,
-                                                ecg_dir=ecg_dir)
+            split_chunkified = chunker.chunkify(
+                SPLIT.ravel(),
+                chunk_size=chunk_size,
+                step_size=step_size,
+                ecg_dir=ecg_dir,
+            )
             # label chunks
-            split_labels = labeler.label_split(split_chunkified,
-                                                    glucose_src=glucose_src,
-                                                    forecast_window=forecast_window)
+            split_labels = labeler.label_split(
+                split_chunkified,
+                glucose_src=glucose_src,
+                forecast_window=forecast_window,
+            )
             # validate and stack
-            chunks_split, y_split = cp.filter_and_stack(
-                                        split_chunkified, split_labels
-                                    )
+            chunks_split, y_split = cp.filter_and_stack(split_chunkified, split_labels)
             # prepare X, y with rolling features
-########################
-# TODO: make prepare_X_y part of model class and argument here
+            ########################
+            # TODO: make prepare_X_y part of model class and argument here
             # that should be model's @classmethod preprocess
-            X_split, y_split = prepare_X_y(chunks_split,
-                                        y_split,
-                                        roll_window_size=roll_window_size,
-                                        roll_step_size=roll_step_size,
-                                        suffix=suffix,
-                                        agg_funcs=agg_funcs) # type: ignore ################ TODO: suffix
+            X_split, y_split = prepare_X_y(
+                chunks_split,
+                y_split,
+                roll_window_size=roll_window_size,
+                roll_step_size=roll_step_size,
+                suffix=suffix,
+                agg_funcs=agg_funcs,
+            )  # type: ignore ################ TODO: suffix
             # save for iterative CV
             splits_prepped.append((X_split, y_split))
 
@@ -244,21 +251,19 @@ class CrossValidator:
 
         return splits_prepped
 
-
-
-    def _get_split_mean_labels(self,
-                               splits_prepped: list) -> list:
-        extr = lambda x: np.mean(splits_prepped[x][1])
+    def _get_split_mean_labels(self, splits_prepped: list) -> list:
+        extr = lambda x: np.mean(splits_prepped[x][1]).round(4)
         n_splits = len(splits_prepped)
         return list(map(extr, range(n_splits)))
 
-
-
-
-
-    def validate_model_cv(self,
-                          model,
-                          splits_prepped: list) -> dict:
+    def validate_model_cv(
+        self,
+        model,
+        splits_prepped: list,
+        resample: bool = True,
+        desired_pos_ratio: float = 0.3,
+        reduction_factor: float = 0.777,
+    ) -> dict:
         """
         Perform cross-validation and collect validation PR-AUCs
         Args:
@@ -269,35 +274,170 @@ class CrossValidator:
             val_ave_precisions: list of validation average precision scores for each split
         """
 
-         # collect val PR-AUCs
-         # from sklearn.metrics import precision_recall_curve, auc
-         # collect val average precision scores
-         # from sklearn.metrics import average_precision_score
+        # collect val PR-AUCs
+        # from sklearn.metrics import precision_recall_curve, auc
+        # collect val average precision scores
+        # from sklearn.metrics import average_precision_score
         val_pr_aucs = []
         val_ave_precisions = []
 
         for VAL_SPLIT_INDEX in range(len(splits_prepped)):
 
+            print("==================================================")
+            print(
+                f"Cross-Validation Iteration: Using split {VAL_SPLIT_INDEX} as validation set"
+            )
+            print(
+                f"""
+                        With mean positive class ratio: {self._get_split_mean_labels(splits_prepped)[VAL_SPLIT_INDEX]:.3f}\n
+                """
+            )
+
             X_val, y_val = splits_prepped[VAL_SPLIT_INDEX]
 
+            train_splits_idx = [
+                i for i in range(len(splits_prepped)) if i != VAL_SPLIT_INDEX
+            ]
+
+            if str(model.__class__) == "<class 'xgboost.sklearn.XGBClassifier'>" and not resample:
+                original_labels = np.concatenate([splits_prepped[i][1] for i in train_splits_idx])
+                scale_pos_weight = (original_labels == 0).sum() / (original_labels == 1).sum()
+
+                model.scale_pos_weight = scale_pos_weight
+                print(f">>>>   Setting XGBoost scale_pos_weight to {scale_pos_weight:.3f}")
+
+            splits_prepped_resampled = splits_prepped.copy()
+            if resample:
+
+                self.desired_pos_ratio = desired_pos_ratio
+                self.reduction_factor = reduction_factor
+
+                print("==================================================")
+                print(
+                    f"Resampling training folds {train_splits_idx} \n to achieve ~{self.desired_pos_ratio} positive class ratio..."
+                )
+
+                for SPLIT_INDEX in train_splits_idx:
+                    splits_prepped_resampled[SPLIT_INDEX] = (
+                        self._resample_split_recursive(
+                            splits_prepped_resampled[SPLIT_INDEX],
+                            desired_pos_ratio=self.desired_pos_ratio,
+                            reduction_factor=self.reduction_factor,
+                        )
+                    )
+
+                print("RESAMPLED")
+
             # stack X_trains from other splits
-            X_train = pd.concat([splits_prepped[i][0] for i in range(len(splits_prepped)) if i != VAL_SPLIT_INDEX])
-            y_train = np.hstack([splits_prepped[i][1] for i in range(len(splits_prepped)) if i != VAL_SPLIT_INDEX])
+            X_train = pd.concat(
+                [splits_prepped_resampled[i][0] for i in train_splits_idx]
+            )
+            y_train = np.hstack(
+                [splits_prepped_resampled[i][1] for i in train_splits_idx]
+            )
+
+            print(f"Train positive class ratio: {np.mean(y_train):.3f}")
 
             # fit model
+            print("--------------------------------------------------")
+            print(f"Fitting model on training folds {train_splits_idx}...")
+
+
+
             model.fit(X_train, y_train)
+
+            print(f"Evaluating model on training folds {train_splits_idx}...")
             # predict probabilities
-            y_probs = model.predict_proba(X_val)[:, 1]
+            y_probs_train = model.predict_proba(X_train)[:, 1]
+
             # compute PR-AUC
-
-            precision, recall, _ = precision_recall_curve(y_val, y_probs)
+            precision, recall, _ = precision_recall_curve(y_train, y_probs_train)
             pr_auc = auc(recall, precision)
-            val_pr_aucs.append(pr_auc)
-            ave_precision = average_precision_score(y_val, y_probs)
-            val_ave_precisions.append(ave_precision)
-            print(f"Split {VAL_SPLIT_INDEX+1} PR-AUC: {pr_auc:.4f}, Average Precision: {ave_precision:.4f}")
+            val_pr_aucs.append(round(pr_auc, 3))
 
-        return {
-            'val_pr_aucs': val_pr_aucs,
-            'val_ave_precisions': val_ave_precisions
-        }
+            # compute average precision score
+            ave_precision = average_precision_score(y_train, y_probs_train)
+            val_ave_precisions.append(round(ave_precision, 3))
+            print(
+                f"""
+                    TRAIN PR-AUC: {pr_auc:.4f}, Average Precision: {ave_precision:.4f}
+                """
+            )
+            print("""
+                ••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+                  """)
+
+
+            print(f"Evaluating model on VALIDATION fold {VAL_SPLIT_INDEX}...")
+            # predict probabilities
+            y_probs_val = model.predict_proba(X_val)[:, 1]
+
+            # compute PR-AUC
+            precision, recall, _ = precision_recall_curve(y_val, y_probs_val)
+            pr_auc = auc(recall, precision)
+            val_pr_aucs.append(round(pr_auc, 3))
+
+            # compute average precision score
+            ave_precision = average_precision_score(y_val, y_probs_val)
+            val_ave_precisions.append(round(ave_precision, 3))
+            print(
+                f"""
+                    VALIDATION PR-AUC: {pr_auc:.4f}, Average Precision: {ave_precision:.4f}
+                """
+            )
+            print("""
+                ••••••••••••••••••••••••••••••••••••••••••••••••••••••••\n\n
+                  """)
+        return {"val_pr_aucs": val_pr_aucs, "val_ave_precisions": val_ave_precisions}
+
+    def _resample_split_recursive(
+        self, split, desired_pos_ratio=0.4, reduction_factor=0.5
+    ):
+
+        # recurrently check if we're above threshold
+        if np.mean(split[1]) >= desired_pos_ratio \
+                    and np.mean(split[1]) <= desired_pos_ratio + 0.1:
+            return split
+
+        # if there are too many ones, undersample positive class
+        elif np.mean(split[1]) >= desired_pos_ratio + 0.1:
+            ys = split[1]
+            pos_idx = np.where(ys == 1)[0]
+            neg_idx = np.where(ys == 0)[0]
+
+            undersamp_idx = np.random.choice(
+                pos_idx, int(pos_idx.size * reduction_factor), replace=False
+            )
+            new_idx = np.concatenate([undersamp_idx, neg_idx])
+            new_idx.sort()
+
+            X_split_resampled = split[0].iloc[new_idx]
+            y_split_resampled = split[1][new_idx]
+
+            split_resampled = (X_split_resampled, y_split_resampled)
+
+            return self._resample_split_recursive(
+                split_resampled, desired_pos_ratio, reduction_factor
+            )
+
+        # if there are too many zeros, undersample negative class
+        #elif np.mean(split[1]) <= desired_pos_ratio:
+        else:
+            ys = split[1]
+            pos_idx = np.where(ys == 1)[0]
+            neg_idx = np.where(ys == 0)[0]
+
+            undersamp_idx = np.random.choice(
+                neg_idx, int(neg_idx.size * reduction_factor), replace=True
+            )
+            new_idx = np.concatenate([undersamp_idx, pos_idx])
+            new_idx.sort()
+
+            X_split_resampled = split[0].iloc[new_idx]
+            y_split_resampled = split[1][new_idx]
+
+            split_resampled = (X_split_resampled, y_split_resampled)
+
+            return self._resample_split_recursive(
+                split_resampled, desired_pos_ratio, reduction_factor
+            )
