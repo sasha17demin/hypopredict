@@ -12,7 +12,7 @@ Restructured package with clear separation of concerns:
 """
 
 # Core functionality
-from hypopredict.core.data_types import PersonDay#, HypopredictError#, Person, HypopredictError
+#from legacy.data_types import PersonDay#, HypopredictError#, Person, HypopredictError
 
 # # Data operations
 # from hypopredict.data import (
@@ -33,7 +33,7 @@ from hypopredict.core.data_types import PersonDay#, HypopredictError#, Person, H
 # from hypopredict import config
 
 # Version
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 __all__ = [
     # Core
