@@ -1,6 +1,7 @@
 ## Data Folder
 d1_get_familiar/data/
 data_ecg/
+data_ecg.zip
 
 # Standard python ignores
 *.egg-info
