@@ -17,8 +17,8 @@ class Lstmcnnmodel:
         inp = Input(shape=(None, n_features))  # variable timesteps
 
         x = LSTM(64, return_sequences=True, activation="tanh")(inp)
-        x = Conv1D(32, kernel_size=3, activation="relu")(x)
-        x = MaxPooling1D(pool_size=2)(x)
+        x = Conv1D(32, kernel_size=8, activation="relu")(x)
+        x = MaxPooling1D(pool_size=8)(x)
         x = GlobalMaxPooling1D()(x)
         x = Dropout(0.3)(x)
         x = Dense(50, activation="relu")(x)
