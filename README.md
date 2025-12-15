@@ -52,6 +52,29 @@ D1Namo dataset: https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-dat
 
 ---
 
+## Today: 5 days to DEMO (Mon Dec 12) -- WE REFACTOR + INIT FRONT-END
+
+
+
+
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+---
+---
+---
+
+_In Search of Lost Time -- Previous Days_
+
 ## Today: Day 4 (Thu Dec 11) -- WE FINE-TUNE AND START TO FUSE
 
 
@@ -74,22 +97,6 @@ D1Namo dataset: https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-dat
 
 1. 
 
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
----
----
----
-
-_In Search of Lost Time -- Previous Days_
 
 ## Today: Day 3 (Wed Dec 10) -- <span style='color: red;'> WE MODEL </span>
 
