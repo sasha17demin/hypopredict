@@ -10,6 +10,10 @@ import pandas as pd
 import numpy as np
 import os
 
+from sklearn.metrics import precision_recall_curve, auc
+from sklearn.metrics import average_precision_score
+
+
 from hypopredict import chunker, labeler
 import hypopredict.compressor as comp
 from hypopredict.core.person import Person
@@ -231,7 +235,8 @@ class CrossValidator:
                                         y_split,
                                         roll_window_size=roll_window_size,
                                         roll_step_size=roll_step_size,
-                                        suffix='roll_15m') # type: ignore ################ TODO: suffix
+                                        suffix=suffix,
+                                        agg_funcs=agg_funcs) # type: ignore ################ TODO: suffix
             # save for iterative CV
             splits_prepped.append((X_split, y_split))
 
@@ -250,10 +255,6 @@ class CrossValidator:
 
 
 
-        # collect val PR-AUCs
-    from sklearn.metrics import precision_recall_curve, auc
-    # collect val average precision scores
-    from sklearn.metrics import average_precision_score
 
     def validate_model_cv(self,
                           model,
