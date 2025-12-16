@@ -42,7 +42,7 @@ class Person:
 
         del self.glucose_data
 
-    def load_ECG_day(self, day: int or str, warning: bool = True) -> None:
+    def load_ECG_day(self, day: int or str, warning: bool = False) -> None:
         """
         Load and concatenate ECG data for a given day.
 
