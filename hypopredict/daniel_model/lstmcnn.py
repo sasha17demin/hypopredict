@@ -48,7 +48,7 @@ class Lstmcnnmodel:
         self.model = Model(inputs=inp, outputs=out)
 
         self.model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=train_cfg["learning_rate"]),
+            optimizer=tf.keras.optimizers.Adam(learning_rate=float(train_cfg["learning_rate"])),
             loss = Lstmcnnmodel.focal_loss(train_cfg.get("focal_alpha", 0.25), train_cfg.get("focal_gamma", 2.0)),
             metrics=[
                 "accuracy",
