@@ -2,14 +2,22 @@ import numpy as np
 import tensorflow as tf
 
 class PadAfterBatchSequence(tf.keras.utils.Sequence):
-    def __init__(self, X_list, y, batch_size=32, shuffle=True, maxlen=None, pad_value=0.0):
-        """
-        X_list: list of arrays, each shape (timesteps_i, features)
-        y: array/list shape (n_samples,)
-        maxlen: optional cap on timesteps (truncate longer sequences)
-        """
+    """
+    This is a Keras Sequence that pads variable-length sequences in a batch
+    to the length of the longest sequence in that batch.
+    Parameters:
+    - X_list: list of numpy arrays, each of shape (timesteps, features)
+    - y: numpy array of labels
+    - batch_size: int, size of each batch
+    - shuffle: bool, whether to shuffle data at the end of each epoch
+    - maxlen: int or None, maximum length to pad/truncate sequences to
+    - pad_value: float, value to use for padding
+
+    """
+    def __init__(self, X_list, y, class_weight=None, batch_size=32, shuffle=True, maxlen=None, pad_value=0.0):
         self.X_list = X_list
         self.y = np.asarray(y)
+        self.class_wight = class_weight
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.maxlen = maxlen
@@ -22,6 +30,7 @@ class PadAfterBatchSequence(tf.keras.utils.Sequence):
         return int(np.ceil(len(self.indices) / self.batch_size))
 
     def __getitem__(self, idx):
+
         batch_ids = self.indices[idx * self.batch_size : (idx + 1) * self.batch_size]
 
         X_batch_list = [self.X_list[i] for i in batch_ids]
@@ -43,8 +52,16 @@ class PadAfterBatchSequence(tf.keras.utils.Sequence):
             x_trunc = x[:batch_maxlen]
             X_padded[j, :x_trunc.shape[0], :] = x_trunc
 
+        if getattr(self, "class_weight", None) is not None:
+            sample_weight_batch = make_sample_weights(y_batch, self.class_weight)
+            return X_padded, y_batch, sample_weight_batch
+
+
         return X_padded, y_batch
 
     def on_epoch_end(self):
         if self.shuffle:
             np.random.shuffle(self.indices)
+
+    def make_sample_weights(y, class_weight):
+        return np.array([class_weight[int(label)] for label in y], dtype=np.float32)

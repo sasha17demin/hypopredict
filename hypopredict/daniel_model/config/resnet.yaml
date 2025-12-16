@@ -1,0 +1,18 @@
+model_name: resnet1d
+
+architecture:
+  type: resnet1d
+  filters: 32
+  kernel_size: 5
+  n_blocks: 3
+  dropout: 0.3
+  dense_units: 50
+
+training:
+  loss: focal
+  focal_alpha: 0.5
+  focal_gamma: 2.0
+  optimizer: adam
+  learning_rate: 5e-5
+  batch_size: 32
+  epochs: 30
