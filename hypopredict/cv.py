@@ -468,9 +468,6 @@ class CrossValidator:
 
                 X_val, y_val = splits_prepped[VAL_SPLIT_INDEX]
 
-                X_not_na_idx
-                y_val = y_val[X_val.index]
-
                 train_splits_idx = [
                     i for i in range(len(splits_prepped)) if i != VAL_SPLIT_INDEX
                 ]
@@ -505,8 +502,6 @@ class CrossValidator:
                     [splits_prepped_resampled[i][1] for i in train_splits_idx]
                 )
 
-                X_train.dropna(inplace=True)
-                y_train = y_train[X_train.index]
 
                 model.fit(X_train, y_train)
 
