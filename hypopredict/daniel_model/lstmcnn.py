@@ -33,6 +33,9 @@ class Lstmcnnmodel:
         arch = config['architecture']
         train_cfg = config['training']
 
+        # Keras.Tuner similar approach than gridsearch but for DL
+        # Optuna more powerful but more complex
+
         inp = Input(shape=(None, n_features))  # variable timesteps
 
         x = LSTM(arch['lstm_units'], return_sequences=True, activation="tanh")(inp)

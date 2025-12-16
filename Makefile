@@ -100,6 +100,10 @@ docker_deploy:
 		--region $(GCP_REGION)
 
 
+# Make function that regroup all step to build, push and deploy
+docker_full_deploy: docker_build docker_run docker_push docker_deploy
+
+
 # CICD
 default: pylint pytest #Default functions if we just write "make"
 pylint:
