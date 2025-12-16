@@ -1,0 +1,24 @@
+model_name: baseline_lstmcnn
+
+architecture:
+  type: lstm_cnn
+  lstm_units: 64
+  conv_filters: 32
+  kernel_size: 5
+  pool_size: 4
+  dropout: 0.3
+  dense_units: 50
+
+training:
+  loss: focal
+  focal_alpha: 0.5
+  focal_gamma: 2.0
+  optimizer: adam
+  learning_rate: 5e-5
+  batch_size: 32
+  epochs: 30
+
+data:
+  window_minutes: 15
+  slide_minutes: 5
+  forecast_minutes: 30

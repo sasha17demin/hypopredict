@@ -2,34 +2,54 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, Input
-from tensorflow.keras.layers import LSTM, Conv1D, MaxPooling1D, Dropout, Dense, GlobalMaxPooling1D
+from tensorflow.keras.layers import LSTM, Conv1D, MaxPooling1D, Dropout, Dense, GlobalMaxPooling1D, BatchNormalization, GlobalAveragePooling1D
 from tensorflow.keras.callbacks import EarlyStopping
 
 
 
 class Lstmcnnmodel:
 
-    def __init__(self, n_features):
+    @staticmethod
+    def focal_loss(alpha=0.75, gamma=2.0):
+        def loss(y_true, y_pred):
+            y_true = tf.cast(y_true, tf.float32)
+            eps = tf.keras.backend.epsilon()
+            y_pred = tf.clip_by_value(y_pred, eps, 1.0 - eps)
+
+            pt = tf.where(tf.equal(y_true, 1), y_pred, 1 - y_pred)
+            w  = tf.where(tf.equal(y_true, 1), alpha, 1 - alpha)
+
+            return -tf.reduce_mean(w * tf.pow(1 - pt, gamma) * tf.math.log(pt))
+        return loss
+
+
+    def __init__(self, config, n_features):
 
         #Plot learning curvec and if overfitt add regularizaetion and dropout layers
         #make a learning rate expo decay
         #Add normalization layers
+        self.config = config
+
+        arch = config['architecture']
+        train_cfg = config['training']
+
         inp = Input(shape=(None, n_features))  # variable timesteps
 
-        x = LSTM(64, return_sequences=True, activation="tanh")(inp)
-        x = Conv1D(32, kernel_size=8, activation="relu")(x)
-        x = MaxPooling1D(pool_size=8)(x)
-        x = GlobalMaxPooling1D()(x)
-        x = Dropout(0.3)(x)
-        x = Dense(50, activation="relu")(x)
-        x = Dropout(0.3)(x)
+        x = LSTM(arch['lstm_units'], return_sequences=True, activation="tanh")(inp)
+        x = Conv1D(arch['conv_filters'], kernel_size=arch['kernel_size'], activation="relu")(x)
+        x = BatchNormalization()(x)
+        x = MaxPooling1D(pool_size=arch['pool_size'])(x)
+        x = GlobalAveragePooling1D()(x)
+        x = Dropout(arch['dropout'])(x)
+        x = Dense(arch['dense_units'], activation="relu")(x)
+        x = Dropout(arch['dropout'])(x)
         out = Dense(1, activation="sigmoid")(x)
 
         self.model = Model(inputs=inp, outputs=out)
 
         self.model.compile(
-            optimizer="adam",
-            loss="binary_crossentropy",
+            optimizer=tf.keras.optimizers.Adam(learning_rate=train_cfg["learning_rate"]),
+            loss = Lstmcnnmodel.focal_loss(train_cfg.get("focal_alpha", 0.25), train_cfg.get("focal_gamma", 2.0)),
             metrics=[
                 "accuracy",
                 tf.keras.metrics.AUC(name="auc", curve="PR"),
@@ -40,13 +60,13 @@ class Lstmcnnmodel:
 
 
     def train(self, train_seq, val_seq, epochs=10):
-        es = EarlyStopping(patience=3, restore_best_weights=True)
+        es = EarlyStopping( monitor="val_pr_auc",mode="max",patience=8, restore_best_weights=True)
 
         return self.model.fit(
             train_seq,
             validation_data=val_seq,
             epochs=epochs,
-            callbacks=[es],
+            callbacks=[es]
         )
 
     def predict(self, X_test):
