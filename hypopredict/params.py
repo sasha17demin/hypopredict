@@ -63,3 +63,22 @@ ZERO_DAYS = [11, 12, 31, 42, 44,
 # 35 total days, 5 of which are invalid
 # 10 days for test and demo: 8 test + 2 demo
 # 20 days for cross-validation and training
+
+
+
+import os
+import pandas as pd
+
+mlpreproc_params = {
+            "ecg_dir": os.getenv("ECG_PATH"),
+            "glucose_src": "local",
+            "n_splits": 5,
+            "chunk_size": pd.Timedelta(minutes=60),
+            "step_size": pd.Timedelta(minutes=10),
+            "forecast_window": pd.Timedelta(minutes=90),
+            "roll_window_size": pd.Timedelta(minutes=40),
+            "roll_step_size": pd.Timedelta(minutes=2),
+            "suffix": f"rolling",
+            "agg_funcs": ["mean", "std", "min", "max", "median", "skew", "kurtosis"],
+            "random_state": 17,
+        }

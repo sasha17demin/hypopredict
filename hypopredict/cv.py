@@ -78,7 +78,7 @@ class CV_splitter:
         return np.array(splits)
 
     def validate(
-        self, splits: np.ndarray, verbose: bool = False, warning: bool = True
+        self, splits: np.ndarray, verbose: bool = False, warning: bool = False
     ) -> tuple:
         """
         Ensure each split has HG event, i.e. mean(is_HG) > 0
@@ -132,7 +132,7 @@ class CV_splitter:
         return checks, np.array(props)
 
     def _HG_prop_with_ECG(
-        self, day: int, verbose: bool = False, warning: bool = True
+        self, day: int, verbose: bool = False, warning: bool = False
     ) -> float:
         """
         For a given day, compute proportion of hypoglycemic events
@@ -256,13 +256,13 @@ class CrossValidator:
         n_splits = len(splits_prepped)
         return list(map(extr, range(n_splits)))
 
-    def validate_model_cv(
+    def validate_model_cv_VERBOSE(
         self,
         model,
         splits_prepped: list,
         resample: bool = True,
         desired_pos_ratio: float = 0.3,
-        reduction_factor: float = 0.777,
+        reduction_factor: float = 0.777
     ) -> dict:
         """
         Perform cross-validation and collect validation PR-AUCs
@@ -280,6 +280,7 @@ class CrossValidator:
         # from sklearn.metrics import average_precision_score
         val_pr_aucs = []
         val_ave_precisions = []
+
 
         for VAL_SPLIT_INDEX in range(len(splits_prepped)):
 
@@ -441,3 +442,96 @@ class CrossValidator:
             return self._resample_split_recursive(
                 split_resampled, desired_pos_ratio, reduction_factor
             )
+
+    def validate_model_cv(
+            self,
+            model,
+            splits_prepped: list,
+            resample: bool = True,
+            desired_pos_ratio: float = 0.3,
+            reduction_factor: float = 0.777
+        ) -> dict:
+            """
+            Perform cross-validation and collect validation PR-AUCs
+            Args:
+                model: a scikit-learn compatible model with fit and predict_proba methods
+                splits_prepped: list of (X, y) tuples for each split
+            Returns:
+                val_pr_aucs: list of validation PR-AUCs for each split
+                val_ave_precisions: list of validation average precision scores for each split
+            """
+            val_pr_aucs = []
+            val_ave_precisions = []
+
+
+            for VAL_SPLIT_INDEX in range(len(splits_prepped)):
+
+                X_val, y_val = splits_prepped[VAL_SPLIT_INDEX]
+
+                X_not_na_idx
+                y_val = y_val[X_val.index]
+
+                train_splits_idx = [
+                    i for i in range(len(splits_prepped)) if i != VAL_SPLIT_INDEX
+                ]
+
+                if str(model.__class__) == "<class 'xgboost.sklearn.XGBClassifier'>" and not resample:
+                    original_labels = np.concatenate([splits_prepped[i][1] for i in train_splits_idx])
+                    scale_pos_weight = (original_labels == 0).sum() / (original_labels == 1).sum()
+
+                    model.scale_pos_weight = scale_pos_weight
+
+                splits_prepped_resampled = splits_prepped.copy()
+                if resample:
+
+                    self.desired_pos_ratio = desired_pos_ratio
+                    self.reduction_factor = reduction_factor
+
+                    for SPLIT_INDEX in train_splits_idx:
+                        splits_prepped_resampled[SPLIT_INDEX] = (
+                            self._resample_split_recursive(
+                                splits_prepped_resampled[SPLIT_INDEX],
+                                desired_pos_ratio=self.desired_pos_ratio,
+                                reduction_factor=self.reduction_factor,
+                            )
+                        )
+
+
+                # stack X_trains from other splits
+                X_train = pd.concat(
+                    [splits_prepped_resampled[i][0] for i in train_splits_idx]
+                )
+                y_train = np.hstack(
+                    [splits_prepped_resampled[i][1] for i in train_splits_idx]
+                )
+
+                X_train.dropna(inplace=True)
+                y_train = y_train[X_train.index]
+
+                model.fit(X_train, y_train)
+
+                # predict probabilities
+                y_probs_train = model.predict_proba(X_train)[:, 1]
+
+                # compute PR-AUC
+                precision, recall, _ = precision_recall_curve(y_train, y_probs_train)
+                pr_auc = auc(recall, precision)
+                val_pr_aucs.append(round(pr_auc, 3))
+
+                # compute average precision score
+                ave_precision = average_precision_score(y_train, y_probs_train)
+                val_ave_precisions.append(round(ave_precision, 3))
+
+                # predict probabilities
+                y_probs_val = model.predict_proba(X_val)[:, 1]
+
+                # compute PR-AUC
+                precision, recall, _ = precision_recall_curve(y_val, y_probs_val)
+                pr_auc = auc(recall, precision)
+                val_pr_aucs.append(round(pr_auc, 3))
+
+                # compute average precision score
+                ave_precision = average_precision_score(y_val, y_probs_val)
+                val_ave_precisions.append(round(ave_precision, 3))
+
+            return {"val_pr_aucs": val_pr_aucs, "val_ave_precisions": val_ave_precisions}
