@@ -467,6 +467,8 @@ class CrossValidator:
 
             for VAL_SPLIT_INDEX in range(len(splits_prepped)):
 
+                print("Fold ", VAL_SPLIT_INDEX+1, '/', len(splits_prepped))
+
                 X_val, y_val = splits_prepped[VAL_SPLIT_INDEX]
 
                 train_splits_idx = [

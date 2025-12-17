@@ -25,7 +25,7 @@ def prepare_X_y(chunks,
         # repeat y_train to match length of X_train_train
         repeat_factor = X_feat.shape[0]
         y_repeated = label.repeat(repeat_factor)
-
+# TODO: add column with chunk_last_index in total seconds repeated
         X_list.append(X_feat)
         y_array = np.append(y_array, y_repeated)
 
