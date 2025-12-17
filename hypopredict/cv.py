@@ -445,7 +445,8 @@ class CrossValidator:
 
     def validate_model_cv(
             self,
-            model,
+            models: list,
+            fusion: bool,
             splits_prepped: list,
             resample: bool = True,
             desired_pos_ratio: float = 0.3,
@@ -472,12 +473,11 @@ class CrossValidator:
                     i for i in range(len(splits_prepped)) if i != VAL_SPLIT_INDEX
                 ]
 
-                if str(model.__class__) == "<class 'xgboost.sklearn.XGBClassifier'>" and not resample:
+                if str(models[0].__class__) == "<class 'xgboost.sklearn.XGBClassifier'>" and not resample:
                     original_labels = np.concatenate([splits_prepped[i][1] for i in train_splits_idx])
                     scale_pos_weight = (original_labels == 0).sum() / (original_labels == 1).sum()
 
-                    model.scale_pos_weight = scale_pos_weight
-
+                    models[0].scale_pos_weight = scale_pos_weight
                 splits_prepped_resampled = splits_prepped.copy()
                 if resample:
 
@@ -502,31 +502,80 @@ class CrossValidator:
                     [splits_prepped_resampled[i][1] for i in train_splits_idx]
                 )
 
+                if not fusion:
+                    models[0].fit(X_train, y_train)
 
-                model.fit(X_train, y_train)
+                    # predict probabilities
+                    y_probs_train = models[0].predict_proba(X_train)[:, 1]
 
-                # predict probabilities
-                y_probs_train = model.predict_proba(X_train)[:, 1]
+                    # compute PR-AUC
+                    precision, recall, _ = precision_recall_curve(y_train, y_probs_train)
+                    pr_auc = auc(recall, precision)
+                    val_pr_aucs.append(round(pr_auc, 3))
 
-                # compute PR-AUC
-                precision, recall, _ = precision_recall_curve(y_train, y_probs_train)
-                pr_auc = auc(recall, precision)
-                val_pr_aucs.append(round(pr_auc, 3))
+                    # compute average precision score
+                    ave_precision = average_precision_score(y_train, y_probs_train)
+                    val_ave_precisions.append(round(ave_precision, 3))
 
-                # compute average precision score
-                ave_precision = average_precision_score(y_train, y_probs_train)
-                val_ave_precisions.append(round(ave_precision, 3))
+                    # predict probabilities
+                    y_probs_val = model.predict_proba(X_val)[:, 1]
 
-                # predict probabilities
-                y_probs_val = model.predict_proba(X_val)[:, 1]
+                    # compute PR-AUC
+                    precision, recall, _ = precision_recall_curve(y_val, y_probs_val)
+                    pr_auc = auc(recall, precision)
+                    val_pr_aucs.append(round(pr_auc, 3))
 
-                # compute PR-AUC
-                precision, recall, _ = precision_recall_curve(y_val, y_probs_val)
-                pr_auc = auc(recall, precision)
-                val_pr_aucs.append(round(pr_auc, 3))
+                    # compute average precision score
+                    ave_precision = average_precision_score(y_val, y_probs_val)
+                    val_ave_precisions.append(round(ave_precision, 3))
 
-                # compute average precision score
-                ave_precision = average_precision_score(y_val, y_probs_val)
-                val_ave_precisions.append(round(ave_precision, 3))
+                if fusion:
+                    base1 = models[0]
+                    base1.fit(X_train, y_train)
+                    base2 = models[1]
+                    base2.fit(X_train, y_train)
+                    base3 = models[2]
+                    base3.fit(X_train, y_train)
+
+                    y_probs_train_b1 = base1.predict_proba(X_train)[:, 1]
+                    y_probs_train_b2 = base2.predict_proba(X_train)[:, 1]
+                    y_probs_train_b3 = base3.predict_proba(X_train)[:, 1]
+
+                    X_train_fusion = pd.DataFrame({
+                            'b1_prob': y_probs_train_b1,
+                            'b2_prob': y_probs_train_b2,
+                            'b3_prob': y_probs_train_b3
+                        })
+                    fusion_model = models[3]
+                    fusion_model.fit(X_train_fusion, y_train)
+
+                    # predict probabilities
+                    y_probs_train_fusion = fusion_model.predict_proba(X_train_fusion)[:, 1]
+                    precision, recall, _ = precision_recall_curve(y_train, y_probs_train_fusion)
+                    pr_auc = auc(recall, precision)
+                    val_pr_aucs.append(round(pr_auc, 3))
+
+                    ave_precision = average_precision_score(y_train, y_probs_train_fusion)
+                    val_ave_precisions.append(round(ave_precision, 3))
+
+                    y_probs_val_b1 = base1.predict_proba(X_val)[:, 1]
+                    y_probs_val_b2 = base2.predict_proba(X_val)[:, 1]
+                    y_probs_val_b3 = base3.predict_proba(X_val)[:, 1]
+
+                    X_val_fusion = pd.DataFrame({
+                            'b1_prob': y_probs_val_b1,
+                            'b2_prob': y_probs_val_b2,
+                            'b3_prob': y_probs_val_b3
+                        })
+                    # predict probabilities
+                    y_probs_val_fusion = fusion_model.predict_proba(X_val_fusion)[:, 1]
+                    precision, recall, _ = precision_recall_curve(y_val, y_probs_val_fusion)
+                    pr_auc = auc(recall, precision)
+                    val_pr_aucs.append(round(pr_auc, 3))
+
+                    ave_precision = average_precision_score(y_val, y_probs_val_fusion)
+                    val_ave_precisions.append(round(ave_precision, 3))
+
+
 
             return {"val_pr_aucs": val_pr_aucs, "val_ave_precisions": val_ave_precisions}
