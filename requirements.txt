@@ -8,6 +8,8 @@ matplotlib
 seaborn
 scikit-learn
 tensorflow
+gdown
+plotly
 #multiprocessing
 
 
