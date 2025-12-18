@@ -11,6 +11,7 @@ def prepare_X_y(chunks,
                 agg_funcs=['mean', 'std', 'min', 'max']):
     X_list = []
     y_array = np.array([])
+    time_list = []
 
     for i in range(len(chunks)):
         chunk = chunks[i]
@@ -25,6 +26,14 @@ def prepare_X_y(chunks,
         # repeat y_train to match length of X_train_train
         repeat_factor = X_feat.shape[0]
         y_repeated = label.repeat(repeat_factor)
+# TODO: add column with chunk_last_index in total seconds repeated
+        forecast_index = chunk.index[-1]
+
+        # Or get total seconds since midnight
+        seconds_since_midnight = np.int64(forecast_index.hour * 3600 + forecast_index.minute * 60 + forecast_index.second)
+
+        X_feat['timestamp'] = [forecast_index]*repeat_factor
+        X_feat['timeofday'] = seconds_since_midnight.repeat(repeat_factor)
 
         X_list.append(X_feat)
         y_array = np.append(y_array, y_repeated)

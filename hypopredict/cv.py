@@ -244,8 +244,14 @@ class CrossValidator:
                 suffix=suffix,
                 agg_funcs=agg_funcs,
             )  # type: ignore ################ TODO: suffix
+
+            y_split_indexed = pd.Series(y_split,
+                                        index = X_split['timestamp'])
+            X_split.drop('timestamp', axis =1, inplace = True)
+
+
             # save for iterative CV
-            splits_prepped.append((X_split, y_split))
+            splits_prepped.append((X_split, y_split_indexed))
 
         self.splits_prepped = splits_prepped
 
@@ -466,6 +472,8 @@ class CrossValidator:
 
 
             for VAL_SPLIT_INDEX in range(len(splits_prepped)):
+
+                print("Fold ", VAL_SPLIT_INDEX+1, '/', len(splits_prepped))
 
                 X_val, y_val = splits_prepped[VAL_SPLIT_INDEX]
 
