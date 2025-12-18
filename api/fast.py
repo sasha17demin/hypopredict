@@ -19,18 +19,21 @@ class PredictRequest(BaseModel):
 
 app = FastAPI()
 
+print(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'hypopredict/daniel_model/checkpoints/baseline/lstmcnn_baseline.keras'))
 
-cnn_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '/home/danielfarkas/code/sasha17demin/hypopredict/hypopredict/daniel_model/checkpoints/baseline/lstmcnn_baseline.keras')
+cnn_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'hypopredict/daniel_model/checkpoints/baseline/lstmcnn_baseline.keras')
 app.state.model_cnn = keras.models.load_model(cnn_path, custom_objects= {"loss": Lstmcnnmodel.focal_loss(alpha=0.75, gamma=2)})
 
-models_XSK_path = '/home/danielfarkas/code/sasha17demin/hypopredict/api/files/fusion2_1_model_trained_dict_0_267.pkl'
+models_XSK_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),'api/files/fusion2_1_model_trained_dict_0_267.pkl')
 with open(models_XSK_path, 'rb') as f:
     app.state.models_dict = pickle.load(f)
 
-with open('/home/danielfarkas/code/sasha17demin/hypopredict/hypopredict/daniel_model/results/cnn_indexed_preds_83.pkl', 'rb') as f:
+index_83_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'hypopredict/daniel_model/results/cnn_indexed_preds_83.pkl')
+with open(index_83_path, 'rb') as f:
     app.state.indexed_preds_83 = pickle.load(f)
 
-with open('/home/danielfarkas/code/sasha17demin/hypopredict/hypopredict/daniel_model/results/cnn_indexed_preds_64.pkl', 'rb') as f:
+index_64_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'hypopredict/daniel_model/results/cnn_indexed_preds_64.pkl')
+with open(index_64_path, 'rb') as f:
     app.state.indexed_preds_64 = pickle.load(f)
 
 
@@ -89,13 +92,17 @@ def predict_from_url(request : PredictRequest):
 @app.get("/predict_fusion_local_83")
 def predict_fusion_local_83():
 
-    with open('/home/danielfarkas/code/sasha17demin/hypopredict/api/files/demo_day_83_seq_demo.pkl', 'rb') as f:
+
+    demo_83_seq_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'api/files/demo_day_83_seq_demo.pkl')
+    with open(demo_83_seq_path, 'rb') as f:
         X_test_cnn = pickle.load(f)
 
-    with open('/home/danielfarkas/code/sasha17demin/hypopredict/hypopredict/daniel_model/results/cnn_indexed_preds_83.pkl', 'rb') as f:
+    index_83_seq_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'hypopredict/daniel_model/results/cnn_indexed_preds_83.pkl')
+    with open(index_83_seq_path, 'rb') as f:
         index_83 = pickle.load(f)
 
-    with open('/home/danielfarkas/code/sasha17demin/hypopredict/api/files/FINAL_83_DEMO_TIME_ml_prepped_cv_splits_20251218_152009.pkl', 'rb') as f:
+    split_prepped_test_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'api/files/FINAL_83_DEMO_TIME_ml_prepped_cv_splits_20251218_152009.pkl')
+    with open(split_prepped_test_path, 'rb') as f:
         split_prepped_test = pickle.load(f)['splits_prepped']
 
     # persist the index
@@ -129,13 +136,16 @@ def predict_fusion_local_83():
 @app.get("/predict_fusion_local_64")
 def predict_fusion_local_64():
 
-    with open('/home/danielfarkas/code/sasha17demin/hypopredict/api/files/demo_day_64_seq_demo.pkl', 'rb') as f:
+    demo_64_seq_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'api/files/demo_day_64_seq_demo.pkl')
+    with open(demo_64_seq_path, 'rb') as f:
         X_test_cnn = pickle.load(f)
 
-    with open('/home/danielfarkas/code/sasha17demin/hypopredict/hypopredict/daniel_model/results/cnn_indexed_preds_64.pkl', 'rb') as f:
+    index_64_seq_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'hypopredict/daniel_model/results/cnn_indexed_preds_64.pkl')
+    with open(index_64_seq_path, 'rb') as f:
         index_64 = pickle.load(f)
 
-    with open('/home/danielfarkas/code/sasha17demin/hypopredict/api/files/FINAL_64_DEMO_TIME_ml_prepped_cv_splits_20251218_154916.pkl', 'rb') as f:
+    split_prepped_test_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'api/files/FINAL_64_DEMO_TIME_ml_prepped_cv_splits_20251218_154916.pkl')
+    with open(split_prepped_test_path, 'rb') as f:
         split_prepped_test = pickle.load(f)['splits_prepped']
 
     # persist the index
