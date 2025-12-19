@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+import plotly.graph_objects as go
+
 pd.options.mode.chained_assignment = None  # suppress pandas warnings
 
 
@@ -123,6 +125,87 @@ def plot_hg_events(person):
     )
     plt.legend()
     plt.show()
+
+def plot_hg_events_plotly(person):
+    df = person["hg_events"]
+    fig = go.Figure()
+
+    # Add glucose level trace
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df["glucose"],
+        mode="lines",
+        name="Glucose Level",
+        line=dict(color="purple", width=2)
+    ))
+
+    # Add HG indicator trace
+    # fig.add_trace(go.Scatter(
+    #     x=df.index,
+    #     y=df["is_hg"],
+    #     mode="lines",
+    #     name="HG Indicator",
+    #     line=dict(color="orange", width=1),
+    #     yaxis="y2"
+    # ))
+
+    # Add vertical lines for onsets (red)
+    onsets = df[df["onset"] == 1].index
+    for onset in onsets:
+        fig.add_vline(
+            x=onset,
+            line_dash="dash",
+            line_color="red",
+            line_width=3,
+            name="HG Onset",
+            showlegend=(onset == onsets[0])  # Only add to legend once
+        )
+
+    # Add vertical lines for ends (green)
+    ends = df[df["end"] == 1].index
+    for end in ends:
+        fig.add_vline(
+            x=end,
+            line_dash="dash",
+            line_color="green",
+            line_width=3,
+            name="HG End",
+            showlegend=(end == ends[0])  # Only add to legend once
+        )
+
+    # Add horizontal line for threshold (yellow)
+    fig.add_hline(
+        y=3.9,
+        line_dash="dot",
+        line_color="black",
+        line_width=3,
+        name="HG Threshold (3.9 mmol/L)"
+    )
+
+    # Update layout
+    fig.update_layout(
+        title=f'Glucose Level with Hypoglycemic Events < 3.9 mmol/L for at Least 15 Minutes',
+        xaxis_title="Time",
+        yaxis_title="Glucose Level (mmol/L)",
+        yaxis2=dict(
+            title="HG Indicator",
+            overlaying="y",
+            side="right"
+        ),
+        hovermode="x unified",
+        template="simple_white",
+        height=500,
+        width=900
+    )
+
+    fig.show()
+    fig.write_html(f"/Users/alexxela/code/hypopredict/hypopredict/demo/{person['ID']}.html")
+
+
+
+
+
+
 
 
 # count number of HG events per day
