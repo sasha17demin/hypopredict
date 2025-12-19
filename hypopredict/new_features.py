@@ -26,7 +26,7 @@ def prepare_X_y(chunks,
         # repeat y_train to match length of X_train_train
         repeat_factor = X_feat.shape[0]
         y_repeated = label.repeat(repeat_factor)
-# TODO: add column with chunk_last_index in total seconds repeated
+
         forecast_index = chunk.index[-1]
 
         # Or get total seconds since midnight

@@ -52,6 +52,7 @@ models/
 .credentials
 secrets.toml
 *.json
+*.html
 
 
 # development notebooks
