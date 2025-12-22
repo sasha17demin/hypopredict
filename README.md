@@ -288,6 +288,8 @@ make docker_full_deploy
 
 ## References
 
+- **Frontend**: [https://hypopredictapp.streamlit.app/](https://hypopredictapp.streamlit.app/)
+- **Demo Slides**: [HypoPredict Demo (December 19. 2025)](https://prezi.com/view/Q6l27TjpLDuveWEeSmc6/?referral_token=Xas-V1lnB3FN)
 - **D1NAMO Dataset**: [Kaggle - D1NAMO ECG Glucose Data](https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-data/data)
 - **Research Paper**: [Example Architecture for Hypoglycemia Prediction](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0325956)
 - **Project Resources**: [Google Drive](https://drive.google.com/drive/folders/1guvUI7XiGqdeLK-qmtjcYF9KlZBd2s3E?usp=share_link)
