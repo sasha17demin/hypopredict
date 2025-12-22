@@ -280,37 +280,8 @@ make docker_run_local_interactively
 make docker_full_deploy
 ```
 
-## 🤝 Contributing
 
-We welcome contributions to HypoPredict! Here's how to get started:
 
-1. **Fork the repository** on GitHub
-2. **Create a feature branch** from `master`
-3. **Make your changes** with clear commit messages
-4. **Add tests** for new functionality
-5. **Ensure code quality**:
-   - Run `make pylint` (no critical errors)
-   - Run `make pytest` (all tests pass)
-6. **Submit a pull request** with a clear description
-
-### Development Guidelines:
-
-- Follow existing code structure and naming conventions
-- Document new functions and classes with docstrings
-- Add type hints where appropriate
-- Keep functions focused and modular
-- Write unit tests for new features
-- Update README if adding major features
-
-### Areas for Contribution:
-
-- Model improvements and new algorithms
-- Feature engineering techniques
-- Data preprocessing optimizations
-- API endpoint enhancements
-- Documentation and examples
-- Performance optimizations
-- Bug fixes and testing
 
 ## 📚 References
 
