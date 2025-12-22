@@ -4,7 +4,7 @@
 
 A machine learning system for predicting hypoglycemic events in Type 1 Diabetic patients using non-invasive ECG signals and advanced fusion modeling techniques.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Problem Overview](#problem-overview)
 - [Package Structure](#package-structure)
@@ -17,7 +17,7 @@ A machine learning system for predicting hypoglycemic events in Type 1 Diabetic 
 - [Contributing](#contributing)
 - [References](#references)
 
-## 🎯 Problem Overview
+## Problem Overview
 
 Hypoglycemia (low blood glucose) is a critical condition that affects individuals with Type 1 Diabetes, potentially leading to severe complications if not detected early. Traditional monitoring methods require invasive blood sampling, which can be inconvenient and uncomfortable for patients.
 
@@ -29,7 +29,7 @@ Hypoglycemia (low blood glucose) is a critical condition that affects individual
 
 The system analyzes time-series data from the D1NAMO dataset, which contains ECG, glucose, acceleration, and breathing measurements from Type 1 Diabetic patients.
 
-## 📦 Package Structure
+## Package Structure
 
 The HypoPredict package is organized into the following components:
 
@@ -66,7 +66,7 @@ api/
 - **Models**: `fusion/`, `daniel_model/` - Individual ML models and fusion ensemble
 - **API**: `api/` - FastAPI server for model inference
 
-## 🤖 Model Architecture
+## Model Architecture
 
 HypoPredict uses a **fusion modeling approach** that combines multiple machine learning algorithms to achieve robust predictions:
 
@@ -95,7 +95,7 @@ The fusion model combines predictions from all individual models using a meta-le
 - **Class imbalance handling**: Focal loss and recursive undersampling
 - **Temporal aggregation**: Rolling median and moving averages for smooth predictions
 
-## 📊 Data Handling
+## Data Handling
 
 ### Cross-Validation System
 
@@ -125,7 +125,7 @@ To handle severe class imbalance (hypoglycemic events are rare):
 5. **Preprocess**: Scale, normalize, and prepare for model input
 6. **Split**: Create train/validation/test sets with custom CV
 
-## 🚀 FastAPI Integration
+## FastAPI Integration
 
 HypoPredict includes a **FastAPI server** (`api/fast.py`) for real-time predictions and system integration:
 
@@ -156,7 +156,7 @@ docker build -t hypopredict:latest .
 docker run -p 8000:8000 hypopredict:latest
 ```
 
-## 🛠️ Installation
+## Installation
 
 ### Prerequisites:
 
@@ -192,7 +192,7 @@ docker run -p 8000:8000 hypopredict:latest
    pip freeze | grep hypopredict
    ```
 
-## 📖 Usage
+## Usage
 
 ### Basic Example:
 
@@ -234,7 +234,7 @@ fusion_pred = response.json()["pred_fusion"]
 cnn_pred = response.json()["pred_cnn"]
 ```
 
-## 👨‍💻 Development
+## Development
 
 ### Project Workflow:
 
@@ -283,25 +283,37 @@ make docker_full_deploy
 
 
 
-## 📚 References
+## References
 
 - **D1NAMO Dataset**: [Kaggle - D1NAMO ECG Glucose Data](https://www.kaggle.com/datasets/sarabhian/d1namo-ecg-glucose-data/data)
 - **Research Paper**: [Example Architecture for Hypoglycemia Prediction](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0325956)
 - **Project Resources**: [Google Drive](https://drive.google.com/drive/folders/1guvUI7XiGqdeLK-qmtjcYF9KlZBd2s3E?usp=share_link)
 
-## 📄 License
 
-This project is licensed under the MIT License.
-
-## 👥 Team
+## Team
 
 **HypoPredict Team**
-- Email: sasha17demin@gmail.com
-- GitHub: [sasha17demin/hypopredict](https://github.com/sasha17demin/hypopredict)
+- Sasha Demin: sasha17demin@gmail.com, [GitHub](https://github.com/sasha17demin/hypopredict)
+- Jennifer Daniel Onwuchekwa:
+- Abdati Laatigue:
+- Daniel Farkas:
+- Musa Danazumi Isah:
 
 ---
 
 **Note**: This project is part of ongoing research in non-invasive glucose monitoring for Type 1 Diabetic patients. The models and predictions are for research purposes and should not replace medical advice or clinical glucose monitoring devices.
+
+---
+
+## License
+
+Copyright (c) 2011-2025 GitHub Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 
