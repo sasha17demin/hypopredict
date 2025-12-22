@@ -50,6 +50,7 @@ hypopredict/
 ├── cv.py                   # Custom cross-validation splitter
 ├── labeler.py              # Hypoglycemic event labeling
 ├── feature_extraction.py   # Feature engineering
+├── new_features.py         # Advanced feature preparation
 ├── compressor.py           # Data compression utilities
 └── params.py               # Configuration parameters
 
@@ -319,7 +320,7 @@ We welcome contributions to HypoPredict! Here's how to get started:
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ## 👥 Team
 
