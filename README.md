@@ -1,6 +1,6 @@
-# HypoPredict 🩺
+# HypoPredict: End-to-End Fusion Model Forecasting Hypoglycemia from ECG
 
-<img src=https://i.pinimg.com/originals/6d/1e/2f/6d1e2ff4321a3656a26c2cdcee79fa8f.png width=400>
+<img src=https://image2url.com/images/1766400717456-d37b68cb-8943-4ff5-9a65-ca29d7e3f68b.png>
 
 A machine learning system for predicting hypoglycemic events in Type 1 Diabetic patients using non-invasive ECG signals and advanced fusion modeling techniques.
 
